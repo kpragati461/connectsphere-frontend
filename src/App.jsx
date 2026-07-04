@@ -3,6 +3,7 @@ import { AuthProvider, useAuth } from './context/AuthContext';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Home from './pages/Home';
+import Profile from './pages/Profile';
 
 const ProtectedRoute = ({ children }) => {
   const { user } = useAuth();
@@ -18,6 +19,9 @@ export default function App() {
           <Route path="/register" element={<Register />} />
           <Route path="/home" element={
             <ProtectedRoute><Home /></ProtectedRoute>
+          } />
+          <Route path="/profile" element={
+            <ProtectedRoute><Profile /></ProtectedRoute>
           } />
           <Route path="/" element={<Navigate to="/login" />} />
         </Routes>
