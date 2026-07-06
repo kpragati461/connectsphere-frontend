@@ -14,12 +14,13 @@ export default function Home() {
     <div style={{ maxWidth: '600px', margin: '80px auto', padding: '2rem' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <h2>Welcome, {user?.username}!</h2>
-        <div style={{ display: 'flex', gap: '10px' }}>
-          <Link to="/profile">My Profile</Link>
+        <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
+          <Link to="/feed">Feed</Link>
+          <Link to="/profile">Profile</Link>
           <button onClick={handleLogout}>Logout</button>
         </div>
       </div>
-      <p>Your feed will appear here.</p>
+      <p>Click Feed to see posts or create your first post!</p>
     </div>
   );
 }

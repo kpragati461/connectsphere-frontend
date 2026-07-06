@@ -4,6 +4,7 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import Home from './pages/Home';
 import Profile from './pages/Profile';
+import Feed from './pages/Feed';
 
 const ProtectedRoute = ({ children }) => {
   const { user } = useAuth();
@@ -22,6 +23,9 @@ export default function App() {
           } />
           <Route path="/profile" element={
             <ProtectedRoute><Profile /></ProtectedRoute>
+          } />
+          <Route path="/feed" element={
+            <ProtectedRoute><Feed /></ProtectedRoute>
           } />
           <Route path="/" element={<Navigate to="/login" />} />
         </Routes>
