@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { getFeed, createPost, deletePost, toggleLike, getComments, addComment } from '../api/postApi';
+import { useNavigate } from 'react-router-dom';
 
 function PostCard({ post, currentUser, onDelete, onLike }) {
   const [comments, setComments] = useState([]);
@@ -9,6 +10,7 @@ function PostCard({ post, currentUser, onDelete, onLike }) {
   const [liked, setLiked] = useState(post.likedByCurrentUser);
   const [likeCount, setLikeCount] = useState(post.likeCount);
   const [commentCount, setCommentCount] = useState(post.commentCount);
+  const navigate = useNavigate();
 
   const handleLike = async () => {
     try {
@@ -62,7 +64,10 @@ function PostCard({ post, currentUser, onDelete, onLike }) {
             {post.username?.charAt(0).toUpperCase()}
           </div>
           <div>
-            <div style={{ fontWeight: '500', fontSize: '14px' }}>@{post.username}</div>
+            <div
+                 onClick={() => navigate(`/profile/${post.username}`)}
+                 style={{ fontWeight: '500', fontSize: '14px', cursor: 'pointer', color: '#6366f1' }}>@{post.username}
+            </div>
             <div style={{ fontSize: '12px', color: '#9ca3af' }}>{formatDate(post.createdAt)}</div>
           </div>
         </div>

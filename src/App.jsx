@@ -21,11 +21,14 @@ export default function App() {
           <Route path="/home" element={
             <ProtectedRoute><Home /></ProtectedRoute>
           } />
+          <Route path="/feed" element={
+            <ProtectedRoute><Feed /></ProtectedRoute>
+          } />
           <Route path="/profile" element={
             <ProtectedRoute><Profile /></ProtectedRoute>
           } />
-          <Route path="/feed" element={
-            <ProtectedRoute><Feed /></ProtectedRoute>
+          <Route path="/profile/:username" element={
+            <ProtectedRoute><Profile /></ProtectedRoute>
           } />
           <Route path="/" element={<Navigate to="/login" />} />
         </Routes>
