@@ -1,26 +1,19 @@
-import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { Link } from 'react-router-dom';
 
 export default function Home() {
-  const { user, logout } = useAuth();
-  const navigate = useNavigate();
-
-  const handleLogout = () => {
-    logout();
-    navigate('/login');
-  };
+  const { user } = useAuth();
 
   return (
     <div style={{ maxWidth: '600px', margin: '80px auto', padding: '2rem' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <h2>Welcome, {user?.username}!</h2>
-        <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
-          <Link to="/feed">Feed</Link>
-          <Link to="/profile">Profile</Link>
-          <button onClick={handleLogout}>Logout</button>
-        </div>
-      </div>
+      <h2>Welcome, {user?.username}!</h2>
       <p>Click Feed to see posts or create your first post!</p>
+      <Link to="/feed" style={{
+        padding: '10px 20px', background: '#6366f1',
+        color: 'white', borderRadius: '8px', textDecoration: 'none'
+      }}>
+        Go to Feed
+      </Link>
     </div>
   );
 }

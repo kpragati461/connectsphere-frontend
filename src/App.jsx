@@ -5,10 +5,17 @@ import Register from './pages/Register';
 import Home from './pages/Home';
 import Profile from './pages/Profile';
 import Feed from './pages/Feed';
+import Navbar from './components/Navbar';
 
 const ProtectedRoute = ({ children }) => {
   const { user } = useAuth();
-  return user ? children : <Navigate to="/login" />;
+  if (!user) return <Navigate to="/login" />;
+  return (
+    <>
+      <Navbar />
+      {children}
+    </>
+  );
 };
 
 export default function App() {
