@@ -7,6 +7,7 @@ import Profile from './pages/Profile';
 import Feed from './pages/Feed';
 import Navbar from './components/Navbar';
 import Chat from './pages/Chat';
+import Admin from './pages/Admin';
 
 const ProtectedRoute = ({ children }) => {
   const { user } = useAuth();
@@ -40,6 +41,7 @@ export default function App() {
           } />
           <Route path="/" element={<Navigate to="/login" />} />
           <Route path="/chat" element={<ProtectedRoute><Chat /></ProtectedRoute>} />
+          <Route path="/admin" element={<ProtectedRoute><Admin /></ProtectedRoute>} />
         </Routes>
       </BrowserRouter>
     </AuthProvider>

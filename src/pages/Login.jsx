@@ -14,16 +14,16 @@ export default function Login() {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError('');
-    try {
-      const res = await loginUser(form);
-      login(res.data.token, res.data.username);
-      navigate('/home');
-    } catch (err) {
-      setError(err.response?.data?.error || 'Invalid username or password');
-    }
-  };
+  e.preventDefault();
+  setError('');
+  try {
+    const res = await loginUser(form);
+    login(res.data.token, res.data.username, res.data.role);
+    navigate('/home');
+  } catch (err) {
+    setError(err.response?.data?.error || 'Invalid username or password');
+  }
+};
 
   return (
     <div style={{ maxWidth: '400px', margin: '80px auto', padding: '2rem' }}>

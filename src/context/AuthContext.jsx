@@ -6,18 +6,21 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(() => {
     const token = localStorage.getItem('token');
     const username = localStorage.getItem('username');
-    return token ? { token, username } : null;
+    const role = localStorage.getItem('role');
+    return token ? { token, username, role } : null;
   });
 
-  const login = (token, username) => {
+  const login = (token, username, role) => {
     localStorage.setItem('token', token);
     localStorage.setItem('username', username);
-    setUser({ token, username });
+    localStorage.setItem('role', role);
+    setUser({ token, username, role });
   };
 
   const logout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('username');
+    localStorage.removeItem('role');
     setUser(null);
   };
 

@@ -149,8 +149,13 @@ export default function Navbar() {
       {/* Nav links */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
         <Link to="/feed" style={{ color: '#374151', textDecoration: 'none', fontSize: '14px' }}>Feed</Link>
-        <Link to="/chat" style={{ color: '#374151', textDecoration: 'none', fontSize: '14px' }}>Chat</Link>
-        <Link to="/profile" style={{ color: '#374151', textDecoration: 'none', fontSize: '14px' }}>Profile</Link>
+<Link to="/chat" style={{ color: '#374151', textDecoration: 'none', fontSize: '14px' }}>Chat</Link>
+<Link to="/profile" style={{ color: '#374151', textDecoration: 'none', fontSize: '14px' }}>Profile</Link>
+{user?.role === 'ADMIN' && (
+  <Link to="/admin" style={{ color: '#6366f1', textDecoration: 'none', fontSize: '14px', fontWeight: '600' }}>
+    Admin
+  </Link>
+)}
         {/* Notification bell */}
         <div style={{ position: 'relative' }}>
           <button onClick={handleBellClick} style={{
