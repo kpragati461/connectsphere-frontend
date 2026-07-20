@@ -222,7 +222,7 @@ export default function Navbar() {
                       </div>
                     </div>
                     <div style={{ fontSize: '16px' }}>
-                      {n.type === 'LIKE' ? '❤️' : n.type === 'COMMENT' ? '💬' : '👤'}
+                      {n.type === 'LIKE' ? '❤️' : n.type === 'COMMENT' ? '💬' : n.type === 'MESSAGE' ? '✉️' : '👤'}
                     </div>
                   </div>
                 ))
