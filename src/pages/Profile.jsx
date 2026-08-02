@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { useParams, useNavigate } from 'react-router-dom';
 import { getMyProfile, getUserProfile, updateMyProfile, toggleFollow } from '../api/userApi';
 import { getUserPosts } from '../api/postApi';
-import { useParams, useNavigate } from 'react-router-dom';
+import { MapPin, Calendar, Users, Edit3, Check, X } from 'lucide-react';
 
 export default function Profile() {
   const { user } = useAuth();
@@ -40,9 +41,7 @@ export default function Profile() {
       try {
         const res = await getUserPosts(profileUsername);
         setPosts(res.data);
-      } catch {
-        console.error('Failed to load posts');
-      }
+      } catch {}
     };
 
     fetchProfile();
@@ -65,145 +64,163 @@ export default function Profile() {
     try {
       const res = await toggleFollow(profileUsername);
       setFollowing(res.data.followed);
-      setFollowerCount((prev) => res.data.followed ? prev + 1 : prev - 1);
+      setFollowerCount(prev => res.data.followed ? prev + 1 : prev - 1);
     } catch {
       setError('Failed to follow user');
     }
   };
 
-  const formatDate = (dateStr) => {
+  const timeAgo = (dateStr) => {
     if (!dateStr) return '';
-    return new Date(dateStr).toLocaleDateString();
+    return new Date(dateStr).toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
   };
 
   if (!profile) return (
-    <p style={{ textAlign: 'center', marginTop: '4rem' }}>Loading...</p>
+    <div style={{ textAlign: 'center', padding: '60px', color: '#9ca3af' }}>
+      Loading profile...
+    </div>
   );
 
   return (
-    <div style={{ maxWidth: '600px', margin: '40px auto', padding: '1rem' }}>
+    <div>
+      {/* Profile card */}
+      <div className="card" style={{ marginBottom: '12px', overflow: 'hidden' }}>
 
-      {/* Back button */}
-      <button onClick={() => navigate(-1)} style={{
-        background: 'none', border: 'none', cursor: 'pointer',
-        color: '#6366f1', marginBottom: '1rem', fontSize: '14px'
-      }}>← Back</button>
+        {/* Cover */}
+        <div style={{
+          height: '100px',
+          background: `linear-gradient(135deg, hsl(${profile.username?.charCodeAt(0) * 10}, 65%, 55%), #6366f1)`,
+        }} />
 
-      {/* Profile header */}
-      <div style={{
-        background: 'white', border: '1px solid #e5e7eb',
-        borderRadius: '12px', padding: '1.5rem', marginBottom: '1rem'
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-            <div style={{
-              width: '72px', height: '72px', borderRadius: '50%',
-              background: '#6366f1', display: 'flex', alignItems: 'center',
-              justifyContent: 'center', fontSize: '1.8rem', color: 'white', fontWeight: 'bold'
+        {/* Avatar + actions */}
+        <div style={{ padding: '0 20px 20px', position: 'relative' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '16px' }}>
+            <div className="avatar" style={{
+              width: '80px', height: '80px', fontSize: '28px',
+              border: '4px solid white', marginTop: '-40px',
+              background: `hsl(${profile.username?.charCodeAt(0) * 10}, 65%, 55%)`,
+              boxShadow: '0 2px 8px rgba(0,0,0,0.15)'
             }}>
               {profile.username?.charAt(0).toUpperCase()}
             </div>
-            <div>
-              <h3 style={{ margin: 0 }}>@{profile.username}</h3>
-              <p style={{ margin: '2px 0', color: '#9ca3af', fontSize: '13px' }}>
-                {profile.email}
-              </p>
-              <span style={{
-                fontSize: '11px', background: '#e0e7ff', color: '#4338ca',
-                padding: '2px 8px', borderRadius: '99px'
+
+            {isOwnProfile ? (
+              <button onClick={() => setEditing(!editing)} className="btn-secondary" style={{
+                display: 'flex', alignItems: 'center', gap: '6px', fontSize: '13px', padding: '7px 14px'
               }}>
-                {profile.role}
-              </span>
+                <Edit3 size={14} /> Edit Profile
+              </button>
+            ) : (
+              <button onClick={handleFollow} style={{
+                padding: '7px 20px', borderRadius: '8px', border: 'none',
+                background: following ? 'white' : '#6366f1',
+                color: following ? '#374151' : 'white',
+                border: following ? '1px solid #d1d5db' : 'none',
+                fontWeight: '600', fontSize: '13px', cursor: 'pointer'
+              }}>
+                {following ? 'Following' : 'Follow'}
+              </button>
+            )}
+          </div>
+
+          {/* Name + info */}
+          <div style={{ marginBottom: '12px' }}>
+            <div style={{ fontWeight: '700', fontSize: '20px', marginBottom: '2px' }}>
+              @{profile.username}
             </div>
-          </div>
-
-          {/* Follow / Edit button */}
-          {isOwnProfile ? (
-            <button onClick={() => setEditing(!editing)} style={{
-              padding: '8px 16px', background: '#f3f4f6',
-              border: '1px solid #d1d5db', borderRadius: '8px',
-              cursor: 'pointer', fontSize: '13px'
+            <div style={{ fontSize: '13px', color: '#9ca3af', marginBottom: '8px' }}>
+              {profile.email}
+            </div>
+            <span style={{
+              fontSize: '11px', background: '#eef2ff', color: '#6366f1',
+              padding: '2px 10px', borderRadius: '99px', fontWeight: '600'
             }}>
-              Edit Profile
-            </button>
-          ) : (
-            <button onClick={handleFollow} style={{
-              padding: '8px 16px',
-              background: following ? '#f3f4f6' : '#6366f1',
-              color: following ? '#374151' : 'white',
-              border: following ? '1px solid #d1d5db' : 'none',
-              borderRadius: '8px', cursor: 'pointer', fontSize: '13px'
-            }}>
-              {following ? 'Unfollow' : 'Follow'}
-            </button>
-          )}
-        </div>
+              {profile.role}
+            </span>
+          </div>
 
-        {/* Follow stats */}
-        <div style={{ display: 'flex', gap: '24px', marginTop: '1rem' }}>
-          <div style={{ textAlign: 'center' }}>
-            <div style={{ fontWeight: '600', fontSize: '16px' }}>{posts.length}</div>
-            <div style={{ fontSize: '12px', color: '#9ca3af' }}>Posts</div>
-          </div>
-          <div style={{ textAlign: 'center' }}>
-            <div style={{ fontWeight: '600', fontSize: '16px' }}>{followerCount}</div>
-            <div style={{ fontSize: '12px', color: '#9ca3af' }}>Followers</div>
-          </div>
-          <div style={{ textAlign: 'center' }}>
-            <div style={{ fontWeight: '600', fontSize: '16px' }}>{profile.followingCount}</div>
-            <div style={{ fontSize: '12px', color: '#9ca3af' }}>Following</div>
-          </div>
-        </div>
-
-        {/* Bio */}
-        <div style={{ marginTop: '1rem' }}>
+          {/* Bio */}
           {editing ? (
-            <div>
+            <div style={{ marginBottom: '12px' }}>
               <textarea
                 value={bio}
-                onChange={(e) => setBio(e.target.value)}
+                onChange={e => setBio(e.target.value)}
                 rows={3}
                 placeholder="Tell people about yourself..."
                 style={{
-                  width: '100%', padding: '8px', borderRadius: '6px',
-                  border: '1px solid #d1d5db', boxSizing: 'border-box'
+                  width: '100%', padding: '10px 12px', borderRadius: '8px',
+                  border: '1px solid #6366f1', fontSize: '14px',
+                  resize: 'none', outline: 'none', boxSizing: 'border-box'
                 }}
               />
               <div style={{ display: 'flex', gap: '8px', marginTop: '8px' }}>
                 <button onClick={handleUpdate} style={{
-                  padding: '6px 16px', background: '#6366f1',
-                  color: 'white', border: 'none', borderRadius: '6px', cursor: 'pointer'
-                }}>Save</button>
+                  display: 'flex', alignItems: 'center', gap: '6px',
+                  padding: '6px 14px', background: '#6366f1', color: 'white',
+                  border: 'none', borderRadius: '8px', cursor: 'pointer', fontSize: '13px'
+                }}>
+                  <Check size={14} /> Save
+                </button>
                 <button onClick={() => setEditing(false)} style={{
-                  padding: '6px 16px', background: '#f3f4f6',
-                  border: '1px solid #d1d5db', borderRadius: '6px', cursor: 'pointer'
-                }}>Cancel</button>
+                  display: 'flex', alignItems: 'center', gap: '6px',
+                  padding: '6px 14px', background: 'white', color: '#374151',
+                  border: '1px solid #d1d5db', borderRadius: '8px', cursor: 'pointer', fontSize: '13px'
+                }}>
+                  <X size={14} /> Cancel
+                </button>
               </div>
             </div>
           ) : (
-            <p style={{ margin: 0, color: profile.bio ? '#374151' : '#9ca3af', fontSize: '14px' }}>
+            <p style={{
+              fontSize: '14px', color: profile.bio ? '#374151' : '#9ca3af',
+              marginBottom: '12px', lineHeight: '1.6'
+            }}>
               {profile.bio || 'No bio yet.'}
             </p>
           )}
-        </div>
 
-        {message && <p style={{ color: 'green', marginTop: '8px' }}>{message}</p>}
-        {error && <p style={{ color: 'red', marginTop: '8px' }}>{error}</p>}
+          {message && <p style={{ color: '#10b981', fontSize: '13px', marginBottom: '8px' }}>{message}</p>}
+          {error && <p style={{ color: '#ef4444', fontSize: '13px', marginBottom: '8px' }}>{error}</p>}
+
+          {/* Stats */}
+          <div style={{
+            display: 'flex', gap: '24px', paddingTop: '12px',
+            borderTop: '1px solid #f3f4f6'
+          }}>
+            {[
+              { label: 'Posts', value: posts.length },
+              { label: 'Followers', value: followerCount },
+              { label: 'Following', value: profile.followingCount },
+            ].map(stat => (
+              <div key={stat.label}>
+                <div style={{ fontWeight: '700', fontSize: '18px' }}>{stat.value}</div>
+                <div style={{ fontSize: '12px', color: '#9ca3af' }}>{stat.label}</div>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
 
-      {/* User posts */}
-      <h4 style={{ marginBottom: '12px' }}>Posts</h4>
+      {/* Posts */}
+      <div style={{ fontWeight: '600', fontSize: '15px', marginBottom: '10px', color: '#374151' }}>
+        Posts
+      </div>
+
       {posts.length === 0 && (
-        <p style={{ color: '#9ca3af', textAlign: 'center' }}>No posts yet.</p>
+        <div className="card" style={{ padding: '32px', textAlign: 'center', color: '#9ca3af' }}>
+          No posts yet.
+        </div>
       )}
-      {posts.map((post) => (
-        <div key={post.id} style={{
-          background: 'white', border: '1px solid #e5e7eb',
-          borderRadius: '12px', padding: '1rem', marginBottom: '1rem'
-        }}>
-          <p style={{ margin: '0 0 8px', fontSize: '15px' }}>{post.content}</p>
-          <div style={{ fontSize: '12px', color: '#9ca3af' }}>
-            {formatDate(post.createdAt)} · ❤️ {post.likeCount} · 💬 {post.commentCount}
+
+      {posts.map(post => (
+        <div key={post.id} className="card" style={{ padding: '16px', marginBottom: '10px' }}>
+          <p style={{ fontSize: '15px', color: '#111827', lineHeight: '1.6', margin: '0 0 10px' }}>
+            {post.content}
+          </p>
+          <div style={{ display: 'flex', gap: '16px', fontSize: '12px', color: '#9ca3af' }}>
+            <span>{new Date(post.createdAt).toLocaleDateString()}</span>
+            <span>❤️ {post.likeCount}</span>
+            <span>💬 {post.commentCount}</span>
           </div>
         </div>
       ))}

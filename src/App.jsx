@@ -5,19 +5,14 @@ import Register from './pages/Register';
 import Home from './pages/Home';
 import Profile from './pages/Profile';
 import Feed from './pages/Feed';
-import Navbar from './components/Navbar';
 import Chat from './pages/Chat';
 import Admin from './pages/Admin';
+import Layout from './components/Layout';
 
 const ProtectedRoute = ({ children }) => {
   const { user } = useAuth();
   if (!user) return <Navigate to="/login" />;
-  return (
-    <>
-      <Navbar />
-      {children}
-    </>
-  );
+  return <Layout>{children}</Layout>;
 };
 
 export default function App() {
@@ -27,21 +22,13 @@ export default function App() {
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
-          <Route path="/home" element={
-            <ProtectedRoute><Home /></ProtectedRoute>
-          } />
-          <Route path="/feed" element={
-            <ProtectedRoute><Feed /></ProtectedRoute>
-          } />
-          <Route path="/profile" element={
-            <ProtectedRoute><Profile /></ProtectedRoute>
-          } />
-          <Route path="/profile/:username" element={
-            <ProtectedRoute><Profile /></ProtectedRoute>
-          } />
-          <Route path="/" element={<Navigate to="/login" />} />
+          <Route path="/home" element={<ProtectedRoute><Home /></ProtectedRoute>} />
+          <Route path="/feed" element={<ProtectedRoute><Feed /></ProtectedRoute>} />
+          <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+          <Route path="/profile/:username" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
           <Route path="/chat" element={<ProtectedRoute><Chat /></ProtectedRoute>} />
           <Route path="/admin" element={<ProtectedRoute><Admin /></ProtectedRoute>} />
+          <Route path="/" element={<Navigate to="/feed" />} />
         </Routes>
       </BrowserRouter>
     </AuthProvider>
