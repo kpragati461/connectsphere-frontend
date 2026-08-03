@@ -2,8 +2,8 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useParams, useNavigate } from 'react-router-dom';
 import { getMyProfile, getUserProfile, updateMyProfile, toggleFollow } from '../api/userApi';
-import { getUserPosts } from '../api/postApi';
-import { MapPin, Calendar, Users, Edit3, Check, X } from 'lucide-react';
+import { getUserPosts, getSavedPosts } from '../api/postApi';
+import { MapPin, Calendar, Users, Edit3, Check, X, Bookmark } from 'lucide-react';
 
 export default function Profile() {
   const { user } = useAuth();
@@ -15,6 +15,7 @@ export default function Profile() {
 
   const [profile, setProfile] = useState(null);
   const [posts, setPosts] = useState([]);
+  const [savedPosts, setSavedPosts] = useState([]);
   const [editing, setEditing] = useState(false);
   const [bio, setBio] = useState('');
   const [message, setMessage] = useState('');
@@ -44,9 +45,18 @@ export default function Profile() {
       } catch {}
     };
 
+    const fetchSavedPosts = async () => {
+      if (!isOwnProfile) return;
+      try {
+        const res = await getSavedPosts();
+        setSavedPosts(res.data);
+      } catch {}
+    };
+
     fetchProfile();
     fetchPosts();
-  }, [profileUsername]);
+    fetchSavedPosts();
+  }, [profileUsername, isOwnProfile]);
 
   const handleUpdate = async () => {
     try {
@@ -201,6 +211,29 @@ export default function Profile() {
           </div>
         </div>
       </div>
+
+      {/* Saved posts */}
+      {isOwnProfile && savedPosts.length > 0 && (
+        <div style={{ marginBottom: '20px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontWeight: '600', fontSize: '15px', marginBottom: '10px', color: '#374151' }}>
+            <Bookmark size={16} />
+            Saved Posts
+          </div>
+          {savedPosts.map(post => (
+            <div key={post.id} className="card" style={{ padding: '16px', marginBottom: '10px' }}>
+              <p style={{ fontSize: '15px', color: '#111827', lineHeight: '1.6', margin: '0 0 10px' }}>
+                {post.content}
+              </p>
+              <div style={{ display: 'flex', gap: '16px', fontSize: '12px', color: '#9ca3af' }}>
+                <span>By @{post.username}</span>
+                <span>{new Date(post.createdAt).toLocaleDateString()}</span>
+                <span>❤️ {post.likeCount}</span>
+                <span>💬 {post.commentCount}</span>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
 
       {/* Posts */}
       <div style={{ fontWeight: '600', fontSize: '15px', marginBottom: '10px', color: '#374151' }}>
