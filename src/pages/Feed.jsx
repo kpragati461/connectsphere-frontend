@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import { getFeed, createPost, deletePost, toggleLike, getComments, addComment } from '../api/postApi';
+import { getFeed, createPost, deletePost, toggleLike, getComments, addComment, deleteComment } from '../api/postApi';
 import { Heart, MessageCircle, Trash2, Send, Image } from 'lucide-react';
 
 function PostCard({ post, currentUser, onDelete }) {
@@ -39,6 +39,15 @@ function PostCard({ post, currentUser, onDelete }) {
       setNewComment('');
     } catch {}
   };
+  const handleDeleteComment = async (commentId) => {
+  try {
+    await deleteComment(commentId);
+    setComments(comments.filter(c => c.id !== commentId));
+    setCommentCount(prev => prev - 1);
+  } catch {
+    console.error('Failed to delete comment');
+  }
+};
 
   const timeAgo = (dateStr) => {
     if (!dateStr) return '';
@@ -127,22 +136,39 @@ function PostCard({ post, currentUser, onDelete }) {
       {showComments && (
         <div style={{ borderTop: '1px solid #f3f4f6', padding: '12px 16px', background: '#fafafa' }}>
           {comments.map((c) => (
-            <div key={c.id} style={{ display: 'flex', gap: '8px', marginBottom: '10px' }}>
-              <div className="avatar" style={{
-                width: '28px', height: '28px', fontSize: '11px', flexShrink: 0,
-                background: `hsl(${c.username?.charCodeAt(0) * 10}, 65%, 55%)`
-              }}>
-                {c.username?.charAt(0).toUpperCase()}
-              </div>
-              <div style={{
-                background: 'white', borderRadius: '10px', padding: '8px 12px',
-                flex: 1, border: '1px solid #f3f4f6'
-              }}>
-                <div style={{ fontSize: '12px', fontWeight: '600', marginBottom: '2px' }}>@{c.username}</div>
-                <div style={{ fontSize: '13px', color: '#374151' }}>{c.content}</div>
-              </div>
-            </div>
-          ))}
+  <div key={c.id} style={{ display: 'flex', gap: '8px', marginBottom: '10px' }}>
+    <div className="avatar" style={{
+      width: '28px', height: '28px', fontSize: '11px', flexShrink: 0,
+      background: `hsl(${c.username?.charCodeAt(0) * 10}, 65%, 55%)`
+    }}>
+      {c.username?.charAt(0).toUpperCase()}
+    </div>
+    <div style={{
+      background: 'white', borderRadius: '10px', padding: '8px 12px',
+      flex: 1, border: '1px solid #f3f4f6'
+    }}>
+      <div style={{
+        display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2px'
+      }}>
+        <div style={{ fontSize: '12px', fontWeight: '600' }}>@{c.username}</div>
+        {c.username === currentUser && (
+          <button
+            onClick={() => handleDeleteComment(c.id)}
+            style={{
+              background: 'none', border: 'none', cursor: 'pointer',
+              color: '#d1d5db', padding: '0 2px', display: 'flex', alignItems: 'center'
+            }}
+            onMouseEnter={e => e.currentTarget.style.color = '#ef4444'}
+            onMouseLeave={e => e.currentTarget.style.color = '#d1d5db'}
+          >
+            <Trash2 size={12} />
+          </button>
+        )}
+      </div>
+      <div style={{ fontSize: '13px', color: '#374151' }}>{c.content}</div>
+    </div>
+  </div>
+))}
 
           <form onSubmit={handleAddComment} style={{ display: 'flex', gap: '8px', marginTop: '8px' }}>
             <input

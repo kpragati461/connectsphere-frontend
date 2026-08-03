@@ -96,11 +96,12 @@ export default function Profile() {
         <div style={{ padding: '0 20px 20px', position: 'relative' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '16px' }}>
             <div className="avatar" style={{
-              width: '80px', height: '80px', fontSize: '28px',
-              border: '4px solid white', marginTop: '-40px',
-              background: `hsl(${profile.username?.charCodeAt(0) * 10}, 65%, 55%)`,
-              boxShadow: '0 2px 8px rgba(0,0,0,0.15)'
-            }}>
+  width: '80px', height: '80px', fontSize: '28px',
+  border: '4px solid white', marginTop: '-40px',
+  background: `hsl(${profile.username?.charCodeAt(0) * 10}, 65%, 55%)`,
+  boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
+  position: 'relative', zIndex: 1
+}}>
               {profile.username?.charAt(0).toUpperCase()}
             </div>
 

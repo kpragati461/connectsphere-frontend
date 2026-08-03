@@ -25,6 +25,21 @@ export default function Layout({ children }) {
     const interval = setInterval(fetchUnreadCount, 30000);
     return () => clearInterval(interval);
   }, [user]);
+  // Close notifications on route change
+  useEffect(() => {
+    setShowNotifs(false);
+  }, [location.pathname]);
+
+  // Close notifications on outside click
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (showNotifs && !e.target.closest('.notif-dropdown') && !e.target.closest('.notif-bell')) {
+        setShowNotifs(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [showNotifs]);
 
   const fetchUnreadCount = async () => {
     try {
@@ -183,7 +198,7 @@ export default function Layout({ children }) {
 
         {/* Notifications */}
         <div style={{ position: 'relative' }}>
-          <button onClick={handleBellClick} style={{
+          <button onClick={handleBellClick} className="notif-bell" style={{
             width: '100%', display: 'flex', alignItems: 'center', gap: '12px',
             padding: '10px 12px', borderRadius: '10px', border: 'none',
             background: showNotifs ? '#eef2ff' : 'transparent',
@@ -205,17 +220,24 @@ export default function Layout({ children }) {
           </button>
 
           {showNotifs && (
-            <div style={{
+            <div className="notif-dropdown" style={{
               position: 'fixed', left: '252px', top: '80px',
               width: '340px', background: 'white',
               border: '1px solid #e5e7eb', borderRadius: '12px',
-              boxShadow: '0 10px 30px rgba(0,0,0,0.12)', zIndex: 300,
+              boxShadow: '0 10px 30px rgba(0,0,0,0.12)', zIndex: 9999,
               maxHeight: '420px', overflowY: 'auto'
             }}>
               <div style={{
-                padding: '14px 16px', borderBottom: '1px solid #f3f4f6',
-                fontWeight: '600', fontSize: '15px'
-              }}>Notifications</div>
+  padding: '14px 16px', borderBottom: '1px solid #f3f4f6',
+  fontWeight: '600', fontSize: '15px',
+  display: 'flex', justifyContent: 'space-between', alignItems: 'center'
+}}>
+  <span>Notifications</span>
+  <button onClick={() => setShowNotifs(false)} style={{
+    background: 'none', border: 'none', cursor: 'pointer',
+    color: '#9ca3af', fontSize: '18px', lineHeight: '1', padding: '0 4px'
+  }}>×</button>
+</div>
               {notifications.length === 0 ? (
                 <div style={{ padding: '24px', textAlign: 'center', color: '#9ca3af', fontSize: '13px' }}>
                   No notifications yet
