@@ -8,7 +8,7 @@ import {
   LogOut, Search, Users
 } from 'lucide-react';
 
-export default function Layout({ children }) {
+export default function Layout({ children, hideRightSidebar = false }) {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
@@ -296,11 +296,12 @@ export default function Layout({ children }) {
       </aside>
 
       {/* ── Main Content ── */}
-      <main style={{ flex: 1, maxWidth: '680px', padding: '24px 16px' }}>
+      <main style={{ flex: 1, maxWidth: hideRightSidebar ? '960px' : '680px', padding: '24px 16px' }}>
         {children}
       </main>
 
       {/* ── Right Sidebar ── */}
+      {!hideRightSidebar && (
       <aside style={{
         width: '280px', flexShrink: 0, padding: '24px 16px',
         position: 'sticky', top: 0, height: '100vh', overflowY: 'auto'
@@ -342,6 +343,7 @@ export default function Layout({ children }) {
           ))}
         </div>
       </aside>
+      )}
     </div>
   );
 }

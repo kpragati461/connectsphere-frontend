@@ -3,5 +3,7 @@ import api from './axiosConfig';
 export const getConversations = () => api.get('/api/conversations');
 export const startConversation = (username) => api.post(`/api/conversations/${username}`);
 export const getMessages = (conversationId) => api.get(`/api/conversations/${conversationId}/messages`);
-export const sendMessage = (conversationId, data) => 
+export const sendMessage = (conversationId, data) =>
     api.post(`/api/conversations/${conversationId}/messages`, data);
+export const sharePostToConversation = (conversationId, postId) =>
+    api.post(`/api/conversations/${conversationId}/share-post/${postId}`);

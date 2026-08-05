@@ -3,6 +3,7 @@ import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { getFeed, createPost, deletePost, toggleLike, toggleBookmark, getComments, addComment, deleteComment } from '../api/postApi';
 import { Heart, MessageCircle, Trash2, Send, Image, Bookmark, Share2 } from 'lucide-react';
+import ShareModal from '../components/ShareModal';
 
 function PostCard({ post, currentUser, onDelete }) {
   const navigate = useNavigate();
@@ -13,6 +14,7 @@ function PostCard({ post, currentUser, onDelete }) {
   const [likeCount, setLikeCount] = useState(post.likeCount);
   const [commentCount, setCommentCount] = useState(post.commentCount);
   const [bookmarked, setBookmarked] = useState(post.bookmarkedByCurrentUser);
+  const [showShareModal, setShowShareModal] = useState(false);
 
   const handleLike = async () => {
     try {
@@ -27,28 +29,6 @@ function PostCard({ post, currentUser, onDelete }) {
       const res = await toggleBookmark(post.id);
       setBookmarked(res.data.saved);
     } catch {}
-  };
-
-  const handleShare = async () => {
-    const shareText = `${post.content}${post.username ? `\n— @${post.username}` : ''}`;
-    const shareUrl = `${window.location.origin}/profile/${post.username}`;
-
-    try {
-      if (navigator.share) {
-        await navigator.share({
-          title: 'Check out this post',
-          text: shareText,
-          url: shareUrl
-        });
-      } else if (navigator.clipboard) {
-        await navigator.clipboard.writeText(`${shareText}\n${shareUrl}`);
-        window.alert('Post link copied to clipboard');
-      }
-    } catch (error) {
-      if (error?.name !== 'AbortError') {
-        console.error('Failed to share post', error);
-      }
-    }
   };
 
   const handleShowComments = async () => {
@@ -175,7 +155,7 @@ function PostCard({ post, currentUser, onDelete }) {
           <span>Save</span>
         </button>
 
-        <button onClick={handleShare} style={{
+        <button onClick={() => setShowShareModal(true)} style={{
           display: 'flex', alignItems: 'center', gap: '6px',
           padding: '7px 12px', borderRadius: '8px', border: 'none',
           background: 'none', cursor: 'pointer', fontSize: '13px',
@@ -248,6 +228,10 @@ function PostCard({ post, currentUser, onDelete }) {
             </button>
           </form>
         </div>
+      )}
+
+      {showShareModal && (
+        <ShareModal post={post} onClose={() => setShowShareModal(false)} />
       )}
     </div>
   );

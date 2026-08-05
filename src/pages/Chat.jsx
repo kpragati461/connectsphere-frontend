@@ -3,7 +3,7 @@ import { useAuth } from '../context/AuthContext';
 import { getConversations, startConversation, getMessages, sendMessage } from '../api/chatApi';
 import { Client } from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
-import { Send, Plus, MessageSquare } from 'lucide-react';
+import { Send, Plus, MessageSquare, Bookmark } from 'lucide-react';
 
 export default function Chat() {
   const { user } = useAuth();
@@ -252,10 +252,16 @@ export default function Chat() {
             </div>
 
             {/* Messages */}
-            <div style={{ flex: 1, overflowY: 'auto', padding: '16px', background: '#fafafa' }}>
+            <div style={{ flex: 1, overflowY: 'auto', overflowX: 'hidden', padding: '16px', background: '#fafafa' }}>
               {messages.map((msg, i) => {
                 const isOwn = msg.senderUsername === user?.username;
                 const showAvatar = i === 0 || messages[i-1]?.senderUsername !== msg.senderUsername;
+                const isSharedPost = !!msg.sharedPostId;
+                // Backend prefixes shared-post messages with "Shared a post: " —
+                // strip that for display since the card label already says so.
+                const displayContent = isSharedPost
+                  ? msg.content.replace(/^Shared a post:\s*/, '')
+                  : msg.content;
                 return (
                   <div key={msg.id} style={{
                     display: 'flex',
@@ -279,9 +285,32 @@ export default function Chat() {
                       color: isOwn ? 'white' : '#111827',
                       border: isOwn ? 'none' : '1px solid #e5e7eb',
                       fontSize: '14px', lineHeight: '1.4',
-                      boxShadow: '0 1px 2px rgba(0,0,0,0.05)'
+                      boxShadow: '0 1px 2px rgba(0,0,0,0.05)',
+                      overflowWrap: 'anywhere', wordBreak: 'break-word', minWidth: 0
                     }}>
-                      <div>{msg.content}</div>
+                      {isSharedPost ? (
+                        <div>
+                          <div style={{
+                            display: 'flex', alignItems: 'center', gap: '5px',
+                            fontSize: '10px', fontWeight: '700', marginBottom: '6px',
+                            color: isOwn ? 'rgba(255,255,255,0.85)' : '#6366f1',
+                            textTransform: 'uppercase', letterSpacing: '0.04em'
+                          }}>
+                            <Bookmark size={11} /> Shared post
+                          </div>
+                          <div style={{
+                            borderRadius: '10px', padding: '8px 10px',
+                            background: isOwn ? 'rgba(255,255,255,0.15)' : '#f9fafb',
+                            border: isOwn ? 'none' : '1px solid #e5e7eb',
+                            fontSize: '13px', lineHeight: '1.4',
+                            overflowWrap: 'anywhere', wordBreak: 'break-word'
+                          }}>
+                            {displayContent}
+                          </div>
+                        </div>
+                      ) : (
+                        <div>{displayContent}</div>
+                      )}
                       <div style={{
                         fontSize: '10px', marginTop: '4px',
                         color: isOwn ? 'rgba(255,255,255,0.65)' : '#9ca3af',
