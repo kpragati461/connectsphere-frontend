@@ -9,10 +9,10 @@ import Chat from './pages/Chat';
 import Admin from './pages/Admin';
 import Layout from './components/Layout';
 
-const ProtectedRoute = ({ children, hideRightSidebar }) => {
+const ProtectedRoute = ({ children }) => {
   const { user } = useAuth();
   if (!user) return <Navigate to="/login" />;
-  return <Layout hideRightSidebar={hideRightSidebar}>{children}</Layout>;
+  return <Layout>{children}</Layout>;
 };
 
 export default function App() {
@@ -26,7 +26,7 @@ export default function App() {
           <Route path="/feed" element={<ProtectedRoute><Feed /></ProtectedRoute>} />
           <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
           <Route path="/profile/:username" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
-          <Route path="/chat" element={<ProtectedRoute hideRightSidebar><Chat /></ProtectedRoute>} />
+          <Route path="/chat" element={<ProtectedRoute><Chat /></ProtectedRoute>} />
           <Route path="/admin" element={<ProtectedRoute><Admin /></ProtectedRoute>} />
           <Route path="/" element={<Navigate to="/feed" />} />
         </Routes>

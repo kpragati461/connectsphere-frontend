@@ -1,14 +1,15 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { createPortal } from 'react-dom';
 import { useAuth } from '../context/AuthContext';
 import { useState, useEffect } from 'react';
-import { getUnreadCount, getNotifications, markAllAsRead } from '../api/notificationApi';
-import { searchUsers } from '../api/userApi';
+import { getUnreadCount, getNotifications, markAllAsRead } from '../api/NotificationApi';
+import { searchUsers } from '../api/UserApi';
 import {
   Home, MessageSquare, Bell, User, Shield,
   LogOut, Search, Users
 } from 'lucide-react';
 
-export default function Layout({ children, hideRightSidebar = false }) {
+export default function Layout({ children }) {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
@@ -168,7 +169,11 @@ export default function Layout({ children, hideRightSidebar = false }) {
               zIndex: 300, maxHeight: '250px', overflowY: 'auto'
             }}>
               {searchResults.map((u) => (
-                <div key={u.id} onClick={() => {
+                <div key={u.id} onMouseDown={(e) => {
+                  // preventDefault stops the input from blurring, which was
+                  // racing against (and sometimes winning over) this click —
+                  // that's why results looked unclickable.
+                  e.preventDefault();
                   navigate(`/profile/${u.username}`);
                   setSearchQuery(''); setShowSearch(false);
                 }} style={{
@@ -219,7 +224,7 @@ export default function Layout({ children, hideRightSidebar = false }) {
             )}
           </button>
 
-          {showNotifs && (
+          {showNotifs && createPortal(
             <div className="notif-dropdown" style={{
               position: 'fixed', left: '252px', top: '80px',
               width: '340px', background: 'white',
@@ -262,7 +267,8 @@ export default function Layout({ children, hideRightSidebar = false }) {
                   </span>
                 </div>
               ))}
-            </div>
+            </div>,
+            document.body
           )}
         </div>
 
@@ -296,54 +302,9 @@ export default function Layout({ children, hideRightSidebar = false }) {
       </aside>
 
       {/* ── Main Content ── */}
-      <main style={{ flex: 1, maxWidth: hideRightSidebar ? '960px' : '680px', padding: '24px 16px' }}>
+      <main style={{ flex: 1, maxWidth: '960px', padding: '24px 16px' }}>
         {children}
       </main>
-
-      {/* ── Right Sidebar ── */}
-      {!hideRightSidebar && (
-      <aside style={{
-        width: '280px', flexShrink: 0, padding: '24px 16px',
-        position: 'sticky', top: 0, height: '100vh', overflowY: 'auto'
-      }}>
-        {/* Profile mini card */}
-        <div className="card" style={{ padding: '20px', marginBottom: '16px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
-            <div className="avatar" style={{ width: '48px', height: '48px', fontSize: '18px' }}>
-              {user?.username?.charAt(0).toUpperCase()}
-            </div>
-            <div>
-              <div style={{ fontWeight: '600', fontSize: '15px' }}>@{user?.username}</div>
-              <div style={{ fontSize: '12px', color: '#9ca3af' }}>{user?.role}</div>
-            </div>
-          </div>
-          <Link to="/profile" className="btn-primary" style={{
-            display: 'block', textAlign: 'center', fontSize: '13px', padding: '7px'
-          }}>
-            View Profile
-          </Link>
-        </div>
-
-        {/* Tips card */}
-        <div className="card" style={{ padding: '16px' }}>
-          <div style={{ fontWeight: '600', fontSize: '14px', marginBottom: '12px', color: '#374151' }}>
-            💡 Quick Tips
-          </div>
-          {[
-            'Follow users to see their posts in your feed',
-            'Click 💬 on any post to leave a comment',
-            'Search users by username to connect',
-            'Use the chat to message anyone directly',
-          ].map((tip, i) => (
-            <div key={i} style={{
-              fontSize: '12px', color: '#6b7280', padding: '6px 0',
-              borderBottom: i < 3 ? '1px solid #f3f4f6' : 'none',
-              lineHeight: '1.5'
-            }}>{tip}</div>
-          ))}
-        </div>
-      </aside>
-      )}
     </div>
   );
 }
