@@ -1,0 +1,238 @@
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { toggleLike, toggleBookmark, getComments, addComment, deleteComment } from '../api/postApi';
+import { Heart, MessageCircle, Trash2, Send, Bookmark, Share2 } from 'lucide-react';
+import ShareModal from './ShareModal';
+
+export default function PostCard({ post, currentUser, onDelete }) {
+  const navigate = useNavigate();
+  const [comments, setComments] = useState([]);
+  const [showComments, setShowComments] = useState(false);
+  const [newComment, setNewComment] = useState('');
+  const [liked, setLiked] = useState(post.likedByCurrentUser);
+  const [likeCount, setLikeCount] = useState(post.likeCount);
+  const [commentCount, setCommentCount] = useState(post.commentCount);
+  const [bookmarked, setBookmarked] = useState(post.bookmarkedByCurrentUser);
+  const [showShareModal, setShowShareModal] = useState(false);
+
+  const handleLike = async () => {
+    try {
+      const res = await toggleLike(post.id);
+      setLiked(res.data.liked);
+      setLikeCount(prev => res.data.liked ? prev + 1 : prev - 1);
+    } catch {}
+  };
+
+  const handleBookmark = async () => {
+    try {
+      const res = await toggleBookmark(post.id);
+      setBookmarked(res.data.saved);
+    } catch {}
+  };
+
+  const handleShowComments = async () => {
+    if (!showComments) {
+      const res = await getComments(post.id);
+      setComments(res.data);
+    }
+    setShowComments(!showComments);
+  };
+
+  const handleAddComment = async (e) => {
+    e.preventDefault();
+    if (!newComment.trim()) return;
+    try {
+      const res = await addComment(post.id, { content: newComment });
+      setComments([...comments, res.data]);
+      setCommentCount(prev => prev + 1);
+      setNewComment('');
+    } catch {}
+  };
+
+  const handleDeleteComment = async (commentId) => {
+    try {
+      await deleteComment(commentId);
+      setComments(comments.filter(c => c.id !== commentId));
+      setCommentCount(prev => prev - 1);
+    } catch {
+      console.error('Failed to delete comment');
+    }
+  };
+
+  const timeAgo = (dateStr) => {
+    if (!dateStr) return '';
+    const diff = Math.floor((Date.now() - new Date(dateStr)) / 1000);
+    if (diff < 60) return `${diff}s`;
+    if (diff < 3600) return `${Math.floor(diff / 60)}m`;
+    if (diff < 86400) return `${Math.floor(diff / 3600)}h`;
+    return `${Math.floor(diff / 86400)}d`;
+  };
+
+  return (
+    <div className="card" style={{ marginBottom: '12px', overflow: 'hidden' }}>
+      {/* Post header */}
+      <div style={{ padding: '16px 16px 12px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div
+          onClick={() => navigate(`/profile/${post.username}`)}
+          style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer' }}
+        >
+          <div className="avatar" style={{
+            width: '42px', height: '42px', fontSize: '16px',
+            background: `hsl(${post.username?.charCodeAt(0) * 10}, 65%, 55%)`
+          }}>
+            {post.username?.charAt(0).toUpperCase()}
+          </div>
+          <div>
+            <div style={{ fontWeight: '600', fontSize: '14px', color: '#111827' }}>
+              @{post.username}
+            </div>
+            <div style={{ fontSize: '12px', color: '#9ca3af' }}>{timeAgo(post.createdAt)} ago</div>
+          </div>
+        </div>
+        {onDelete && post.username === currentUser && (
+          <button onClick={() => onDelete(post.id)} style={{
+            background: 'none', border: 'none', cursor: 'pointer',
+            color: '#d1d5db', padding: '4px', borderRadius: '6px',
+            display: 'flex', alignItems: 'center'
+          }}
+          onMouseEnter={e => e.currentTarget.style.color = '#ef4444'}
+          onMouseLeave={e => e.currentTarget.style.color = '#d1d5db'}
+          >
+            <Trash2 size={15} />
+          </button>
+        )}
+      </div>
+
+      {/* Post content */}
+      <div style={{ padding: '0 16px 14px', fontSize: '15px', color: '#111827', lineHeight: '1.6' }}>
+        {post.content}
+      </div>
+
+      {/* Divider */}
+      <div style={{ borderTop: '1px solid #f3f4f6', margin: '0 16px' }} />
+
+      {/* Actions */}
+      <div style={{ padding: '8px 8px', display: 'flex', gap: '4px' }}>
+        <button onClick={handleLike} style={{
+          display: 'flex', alignItems: 'center', gap: '6px',
+          padding: '7px 12px', borderRadius: '8px', border: 'none',
+          background: 'none', cursor: 'pointer', fontSize: '13px',
+          color: liked ? '#ef4444' : '#6b7280', fontWeight: liked ? '600' : '400',
+          transition: 'all 0.15s'
+        }}
+        onMouseEnter={e => e.currentTarget.style.background = '#fef2f2'}
+        onMouseLeave={e => e.currentTarget.style.background = 'none'}
+        >
+          <Heart size={17} fill={liked ? '#ef4444' : 'none'} />
+          <span>{likeCount}</span>
+        </button>
+
+        <button onClick={handleShowComments} style={{
+          display: 'flex', alignItems: 'center', gap: '6px',
+          padding: '7px 12px', borderRadius: '8px', border: 'none',
+          background: showComments ? '#eef2ff' : 'none', cursor: 'pointer',
+          fontSize: '13px', color: showComments ? '#6366f1' : '#6b7280',
+          transition: 'all 0.15s'
+        }}
+        onMouseEnter={e => { if (!showComments) e.currentTarget.style.background = '#f5f3ff'; }}
+        onMouseLeave={e => { if (!showComments) e.currentTarget.style.background = 'none'; }}
+        >
+          <MessageCircle size={17} />
+          <span>{commentCount}</span>
+        </button>
+
+        <button onClick={handleBookmark} style={{
+          display: 'flex', alignItems: 'center', gap: '6px',
+          padding: '7px 12px', borderRadius: '8px', border: 'none',
+          background: 'none', cursor: 'pointer', fontSize: '13px',
+          color: bookmarked ? '#f59e0b' : '#6b7280', fontWeight: bookmarked ? '600' : '400',
+          transition: 'all 0.15s'
+        }}
+        onMouseEnter={e => e.currentTarget.style.background = '#fff7ed'}
+        onMouseLeave={e => e.currentTarget.style.background = 'none'}
+        >
+          <Bookmark size={17} fill={bookmarked ? '#f59e0b' : 'none'} />
+          <span>Save</span>
+        </button>
+
+        <button onClick={() => setShowShareModal(true)} style={{
+          display: 'flex', alignItems: 'center', gap: '6px',
+          padding: '7px 12px', borderRadius: '8px', border: 'none',
+          background: 'none', cursor: 'pointer', fontSize: '13px',
+          color: '#6b7280', transition: 'all 0.15s'
+        }}
+        onMouseEnter={e => e.currentTarget.style.background = '#f9fafb'}
+        onMouseLeave={e => e.currentTarget.style.background = 'none'}
+        >
+          <Share2 size={17} />
+          <span>Share</span>
+        </button>
+      </div>
+
+      {/* Comments */}
+      {showComments && (
+        <div style={{ borderTop: '1px solid #f3f4f6', padding: '12px 16px', background: '#fafafa' }}>
+          {comments.map((c) => (
+            <div key={c.id} style={{ display: 'flex', gap: '8px', marginBottom: '10px' }}>
+              <div className="avatar" style={{
+                width: '28px', height: '28px', fontSize: '11px', flexShrink: 0,
+                background: `hsl(${c.username?.charCodeAt(0) * 10}, 65%, 55%)`
+              }}>
+                {c.username?.charAt(0).toUpperCase()}
+              </div>
+              <div style={{
+                background: 'white', borderRadius: '10px', padding: '8px 12px',
+                flex: 1, border: '1px solid #f3f4f6'
+              }}>
+                <div style={{
+                  display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2px'
+                }}>
+                  <div style={{ fontSize: '12px', fontWeight: '600' }}>@{c.username}</div>
+                  {c.username === currentUser && (
+                    <button
+                      onClick={() => handleDeleteComment(c.id)}
+                      style={{
+                        background: 'none', border: 'none', cursor: 'pointer',
+                        color: '#d1d5db', padding: '0 2px', display: 'flex', alignItems: 'center'
+                      }}
+                      onMouseEnter={e => e.currentTarget.style.color = '#ef4444'}
+                      onMouseLeave={e => e.currentTarget.style.color = '#d1d5db'}
+                    >
+                      <Trash2 size={12} />
+                    </button>
+                  )}
+                </div>
+                <div style={{ fontSize: '13px', color: '#374151' }}>{c.content}</div>
+              </div>
+            </div>
+          ))}
+
+          <form onSubmit={handleAddComment} style={{ display: 'flex', gap: '8px', marginTop: '8px' }}>
+            <input
+              value={newComment}
+              onChange={e => setNewComment(e.target.value)}
+              placeholder="Write a comment..."
+              style={{
+                flex: 1, padding: '8px 12px', borderRadius: '20px',
+                border: '1px solid #e5e7eb', fontSize: '13px',
+                outline: 'none', background: 'white'
+              }}
+            />
+            <button type="submit" style={{
+              background: '#6366f1', border: 'none', borderRadius: '50%',
+              width: '34px', height: '34px', display: 'flex',
+              alignItems: 'center', justifyContent: 'center', cursor: 'pointer',
+              color: 'white', flexShrink: 0
+            }}>
+              <Send size={14} />
+            </button>
+          </form>
+        </div>
+      )}
+
+      {showShareModal && (
+        <ShareModal post={post} onClose={() => setShowShareModal(false)} />
+      )}
+    </div>
+  );
+}

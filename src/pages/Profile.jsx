@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useParams, useNavigate } from 'react-router-dom';
-import { getMyProfile, getUserProfile, updateMyProfile, toggleFollow } from '../api/userApi';
-import { getUserPosts, getSavedPosts } from '../api/postApi';
+import { getMyProfile, getUserProfile, updateMyProfile, toggleFollow } from '../api/UserApi';
+import { getUserPosts, getSavedPosts, deletePost } from '../api/postApi';
 import { MapPin, Calendar, Users, Edit3, Check, X, Bookmark } from 'lucide-react';
+import PostCard from '../components/PostCard';
 
 export default function Profile() {
   const { user } = useAuth();
@@ -77,6 +78,16 @@ export default function Profile() {
       setFollowerCount(prev => res.data.followed ? prev + 1 : prev - 1);
     } catch {
       setError('Failed to follow user');
+    }
+  };
+
+  const handleDeletePost = async (postId) => {
+    try {
+      await deletePost(postId);
+      setPosts(prev => prev.filter(p => p.id !== postId));
+      setSavedPosts(prev => prev.filter(p => p.id !== postId));
+    } catch {
+      setError('Failed to delete post');
     }
   };
 
@@ -220,17 +231,12 @@ export default function Profile() {
             Saved Posts
           </div>
           {savedPosts.map(post => (
-            <div key={post.id} className="card" style={{ padding: '16px', marginBottom: '10px' }}>
-              <p style={{ fontSize: '15px', color: '#111827', lineHeight: '1.6', margin: '0 0 10px' }}>
-                {post.content}
-              </p>
-              <div style={{ display: 'flex', gap: '16px', fontSize: '12px', color: '#9ca3af' }}>
-                <span>By @{post.username}</span>
-                <span>{new Date(post.createdAt).toLocaleDateString()}</span>
-                <span>❤️ {post.likeCount}</span>
-                <span>💬 {post.commentCount}</span>
-              </div>
-            </div>
+            <PostCard
+              key={post.id}
+              post={post}
+              currentUser={user?.username}
+              onDelete={handleDeletePost}
+            />
           ))}
         </div>
       )}
@@ -247,16 +253,12 @@ export default function Profile() {
       )}
 
       {posts.map(post => (
-        <div key={post.id} className="card" style={{ padding: '16px', marginBottom: '10px' }}>
-          <p style={{ fontSize: '15px', color: '#111827', lineHeight: '1.6', margin: '0 0 10px' }}>
-            {post.content}
-          </p>
-          <div style={{ display: 'flex', gap: '16px', fontSize: '12px', color: '#9ca3af' }}>
-            <span>{new Date(post.createdAt).toLocaleDateString()}</span>
-            <span>❤️ {post.likeCount}</span>
-            <span>💬 {post.commentCount}</span>
-          </div>
-        </div>
+        <PostCard
+          key={post.id}
+          post={post}
+          currentUser={user?.username}
+          onDelete={handleDeletePost}
+        />
       ))}
     </div>
   );
