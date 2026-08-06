@@ -63,30 +63,40 @@ export default function Chat() {
   };
 
   const handleStartConversation = async (e) => {
-    e.preventDefault();
-    if (!searchUsername.trim()) return;
-    try {
-      const res = await startConversation(searchUsername);
-      const convId = res.data.conversationId;
-      await loadConversations();
-      openConversation(convId);
-      setSearchUsername('');
-      setShowNewChat(false);
-    } catch {
+  e.preventDefault();
+  if (!searchUsername.trim()) return;
+  try {
+    const res = await startConversation(searchUsername);
+    const convId = res.data.conversationId;
+    await loadConversations();
+    openConversation(convId);
+    setSearchUsername('');
+    setShowNewChat(false);
+    setError('');
+  } catch (err) {
+    if (err.response?.status === 403) {
+      setError('You cannot start a conversation with this user');
+    } else {
       setError('User not found');
     }
-  };
+  }
+};
 
   const handleSend = async (e) => {
-    e.preventDefault();
-    if (!newMessage.trim() || !activeConvId) return;
-    try {
-      await sendMessage(activeConvId, { content: newMessage });
-      setNewMessage('');
-    } catch {
+  e.preventDefault();
+  if (!newMessage.trim() || !activeConvId) return;
+  try {
+    await sendMessage(activeConvId, { content: newMessage });
+    setNewMessage('');
+    setError('');
+  } catch (err) {
+    if (err.response?.status === 403) {
+      setError('You cannot message this user — one of you has blocked the other');
+    } else {
       setError('Failed to send message');
     }
-  };
+  }
+};
 
   const activeConv = conversations.find(c => c.id === activeConvId);
 

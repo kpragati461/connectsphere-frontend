@@ -1,10 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useParams, useNavigate } from 'react-router-dom';
-import { getMyProfile, getUserProfile, updateMyProfile, toggleFollow } from '../api/UserApi';
+import { getMyProfile, getUserProfile, updateMyProfile, toggleFollow, toggleBlock, getBlockStatus } from '../api/userApi';
 import { getUserPosts, getSavedPosts, deletePost } from '../api/postApi';
-import { MapPin, Calendar, Users, Edit3, Check, X, Bookmark } from 'lucide-react';
-import PostCard from '../components/PostCard';
+import { Edit3, Check, X, Bookmark } from 'lucide-react';
 
 export default function Profile() {
   const { user } = useAuth();
@@ -23,6 +22,8 @@ export default function Profile() {
   const [error, setError] = useState('');
   const [following, setFollowing] = useState(false);
   const [followerCount, setFollowerCount] = useState(0);
+  const [blocked, setBlocked] = useState(false);
+  const [postsBlocked, setPostsBlocked] = useState(false);
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -34,6 +35,11 @@ export default function Profile() {
         setBio(res.data.bio || '');
         setFollowing(res.data.followedByCurrentUser);
         setFollowerCount(res.data.followerCount);
+
+        if (!isOwnProfile) {
+          const blockRes = await getBlockStatus(profileUsername);
+          setBlocked(blockRes.data.blocked);
+        }
       } catch {
         setError('Failed to load profile');
       }
@@ -43,7 +49,13 @@ export default function Profile() {
       try {
         const res = await getUserPosts(profileUsername);
         setPosts(res.data);
-      } catch {}
+        setPostsBlocked(false);
+      } catch (err) {
+        if (err.response?.status === 403) {
+          setPostsBlocked(true);
+          setPosts([]);
+        }
+      }
     };
 
     const fetchSavedPosts = async () => {
@@ -81,6 +93,24 @@ export default function Profile() {
     }
   };
 
+  const handleBlock = async () => {
+    try {
+      const res = await toggleBlock(profileUsername);
+      setBlocked(res.data.blocked);
+      if (res.data.blocked) {
+        setFollowing(false);
+        setPostsBlocked(true);
+        setPosts([]);
+      } else {
+        setPostsBlocked(false);
+        const res2 = await getUserPosts(profileUsername);
+        setPosts(res2.data);
+      }
+    } catch {
+      setError('Failed to update block status');
+    }
+  };
+
   const handleDeletePost = async (postId) => {
     try {
       await deletePost(postId);
@@ -91,13 +121,8 @@ export default function Profile() {
     }
   };
 
-  const timeAgo = (dateStr) => {
-    if (!dateStr) return '';
-    return new Date(dateStr).toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
-  };
-
   if (!profile) return (
-    <div style={{ textAlign: 'center', padding: '60px', color: '#9ca3af' }}>
+    <div style={{ textAlign: 'center', padding: '60px', color: 'var(--text-muted)' }}>
       Loading profile...
     </div>
   );
@@ -117,12 +142,12 @@ export default function Profile() {
         <div style={{ padding: '0 20px 20px', position: 'relative' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '16px' }}>
             <div className="avatar" style={{
-  width: '80px', height: '80px', fontSize: '28px',
-  border: '4px solid white', marginTop: '-40px',
-  background: `hsl(${profile.username?.charCodeAt(0) * 10}, 65%, 55%)`,
-  boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
-  position: 'relative', zIndex: 1
-}}>
+              width: '80px', height: '80px', fontSize: '28px',
+              border: '4px solid white', marginTop: '-40px',
+              background: `hsl(${profile.username?.charCodeAt(0) * 10}, 65%, 55%)`,
+              boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
+              position: 'relative', zIndex: 1
+            }}>
               {profile.username?.charAt(0).toUpperCase()}
             </div>
 
@@ -133,28 +158,38 @@ export default function Profile() {
                 <Edit3 size={14} /> Edit Profile
               </button>
             ) : (
-              <button onClick={handleFollow} style={{
-                padding: '7px 20px', borderRadius: '8px', border: 'none',
-                background: following ? 'white' : '#6366f1',
-                color: following ? '#374151' : 'white',
-                border: following ? '1px solid #d1d5db' : 'none',
-                fontWeight: '600', fontSize: '13px', cursor: 'pointer'
-              }}>
-                {following ? 'Following' : 'Follow'}
-              </button>
+              <div style={{ display: 'flex', gap: '8px' }}>
+                <button onClick={handleFollow} style={{
+                  padding: '7px 20px', borderRadius: '8px',
+                  background: following ? 'var(--bg-card)' : '#6366f1',
+                  color: following ? 'var(--text-secondary)' : 'white',
+                  border: following ? '1px solid var(--border)' : 'none',
+                  fontWeight: '600', fontSize: '13px', cursor: 'pointer'
+                }}>
+                  {following ? 'Following' : 'Follow'}
+                </button>
+                <button onClick={handleBlock} style={{
+                  padding: '7px 14px', borderRadius: '8px', border: 'none',
+                  background: blocked ? '#fee2e2' : 'var(--bg-hover)',
+                  color: blocked ? '#dc2626' : 'var(--text-muted)',
+                  fontWeight: '500', fontSize: '13px', cursor: 'pointer'
+                }}>
+                  {blocked ? 'Unblock' : 'Block'}
+                </button>
+              </div>
             )}
           </div>
 
           {/* Name + info */}
           <div style={{ marginBottom: '12px' }}>
-            <div style={{ fontWeight: '700', fontSize: '20px', marginBottom: '2px' }}>
+            <div style={{ fontWeight: '700', fontSize: '20px', marginBottom: '2px', color: 'var(--text-primary)' }}>
               @{profile.username}
             </div>
-            <div style={{ fontSize: '13px', color: '#9ca3af', marginBottom: '8px' }}>
+            <div style={{ fontSize: '13px', color: 'var(--text-muted)', marginBottom: '8px' }}>
               {profile.email}
             </div>
             <span style={{
-              fontSize: '11px', background: '#eef2ff', color: '#6366f1',
+              fontSize: '11px', background: 'var(--accent-light)', color: 'var(--accent)',
               padding: '2px 10px', borderRadius: '99px', fontWeight: '600'
             }}>
               {profile.role}
@@ -171,22 +206,24 @@ export default function Profile() {
                 placeholder="Tell people about yourself..."
                 style={{
                   width: '100%', padding: '10px 12px', borderRadius: '8px',
-                  border: '1px solid #6366f1', fontSize: '14px',
-                  resize: 'none', outline: 'none', boxSizing: 'border-box'
+                  border: '1px solid var(--accent)', fontSize: '14px',
+                  resize: 'none', outline: 'none', boxSizing: 'border-box',
+                  background: 'var(--bg-secondary)', color: 'var(--text-primary)'
                 }}
               />
               <div style={{ display: 'flex', gap: '8px', marginTop: '8px' }}>
                 <button onClick={handleUpdate} style={{
                   display: 'flex', alignItems: 'center', gap: '6px',
-                  padding: '6px 14px', background: '#6366f1', color: 'white',
+                  padding: '6px 14px', background: 'var(--accent)', color: 'white',
                   border: 'none', borderRadius: '8px', cursor: 'pointer', fontSize: '13px'
                 }}>
                   <Check size={14} /> Save
                 </button>
                 <button onClick={() => setEditing(false)} style={{
                   display: 'flex', alignItems: 'center', gap: '6px',
-                  padding: '6px 14px', background: 'white', color: '#374151',
-                  border: '1px solid #d1d5db', borderRadius: '8px', cursor: 'pointer', fontSize: '13px'
+                  padding: '6px 14px', background: 'var(--bg-card)',
+                  color: 'var(--text-secondary)', border: '1px solid var(--border)',
+                  borderRadius: '8px', cursor: 'pointer', fontSize: '13px'
                 }}>
                   <X size={14} /> Cancel
                 </button>
@@ -194,72 +231,95 @@ export default function Profile() {
             </div>
           ) : (
             <p style={{
-              fontSize: '14px', color: profile.bio ? '#374151' : '#9ca3af',
+              fontSize: '14px',
+              color: profile.bio ? 'var(--text-secondary)' : 'var(--text-muted)',
               marginBottom: '12px', lineHeight: '1.6'
             }}>
               {profile.bio || 'No bio yet.'}
             </p>
           )}
 
-          {message && <p style={{ color: '#10b981', fontSize: '13px', marginBottom: '8px' }}>{message}</p>}
-          {error && <p style={{ color: '#ef4444', fontSize: '13px', marginBottom: '8px' }}>{error}</p>}
+          {message && <p style={{ color: 'var(--success)', fontSize: '13px', marginBottom: '8px' }}>{message}</p>}
+          {error && <p style={{ color: 'var(--danger)', fontSize: '13px', marginBottom: '8px' }}>{error}</p>}
 
           {/* Stats */}
           <div style={{
             display: 'flex', gap: '24px', paddingTop: '12px',
-            borderTop: '1px solid #f3f4f6'
+            borderTop: '1px solid var(--border-light)'
           }}>
             {[
-              { label: 'Posts', value: posts.length },
+              { label: 'Posts', value: posts?.length ?? 0 },
               { label: 'Followers', value: followerCount },
               { label: 'Following', value: profile.followingCount },
             ].map(stat => (
               <div key={stat.label}>
-                <div style={{ fontWeight: '700', fontSize: '18px' }}>{stat.value}</div>
-                <div style={{ fontSize: '12px', color: '#9ca3af' }}>{stat.label}</div>
+                <div style={{ fontWeight: '700', fontSize: '18px', color: 'var(--text-primary)' }}>{stat.value}</div>
+                <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>{stat.label}</div>
               </div>
             ))}
           </div>
         </div>
       </div>
 
-      {/* Saved posts */}
+      {/* Saved posts — only on own profile */}
       {isOwnProfile && savedPosts.length > 0 && (
         <div style={{ marginBottom: '20px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontWeight: '600', fontSize: '15px', marginBottom: '10px', color: '#374151' }}>
-            <Bookmark size={16} />
-            Saved Posts
+          <div style={{
+            display: 'flex', alignItems: 'center', gap: '8px',
+            fontWeight: '600', fontSize: '15px', marginBottom: '10px',
+            color: 'var(--text-secondary)'
+          }}>
+            <Bookmark size={16} /> Saved Posts
           </div>
           {savedPosts.map(post => (
-            <PostCard
-              key={post.id}
-              post={post}
-              currentUser={user?.username}
-              onDelete={handleDeletePost}
-            />
+            <div key={post.id} className="card" style={{ padding: '16px', marginBottom: '10px' }}>
+              <p style={{ fontSize: '15px', color: 'var(--text-primary)', lineHeight: '1.6', margin: '0 0 10px' }}>
+                {post.content}
+              </p>
+              <div style={{ display: 'flex', gap: '16px', fontSize: '12px', color: 'var(--text-muted)' }}>
+                <span>By @{post.username}</span>
+                <span>{new Date(post.createdAt).toLocaleDateString()}</span>
+                <span>❤️ {post.likeCount}</span>
+                <span>💬 {post.commentCount}</span>
+              </div>
+            </div>
           ))}
         </div>
       )}
 
       {/* Posts */}
-      <div style={{ fontWeight: '600', fontSize: '15px', marginBottom: '10px', color: '#374151' }}>
+      <div style={{ fontWeight: '600', fontSize: '15px', marginBottom: '10px', color: 'var(--text-secondary)' }}>
         Posts
       </div>
 
-      {posts.length === 0 && (
-        <div className="card" style={{ padding: '32px', textAlign: 'center', color: '#9ca3af' }}>
+      {postsBlocked ? (
+        <div className="card" style={{ padding: '32px', textAlign: 'center', color: 'var(--text-muted)' }}>
+          <div style={{ fontSize: '32px', marginBottom: '12px' }}>🚫</div>
+          <div style={{ fontWeight: '600', fontSize: '15px', marginBottom: '6px', color: 'var(--text-primary)' }}>
+            Content not available
+          </div>
+          <div style={{ fontSize: '13px' }}>
+            You cannot view this user's posts
+          </div>
+        </div>
+      ) : posts.length === 0 ? (
+        <div className="card" style={{ padding: '32px', textAlign: 'center', color: 'var(--text-muted)' }}>
           No posts yet.
         </div>
+      ) : (
+        posts.map(post => (
+          <div key={post.id} className="card" style={{ padding: '16px', marginBottom: '10px' }}>
+            <p style={{ fontSize: '15px', color: 'var(--text-primary)', lineHeight: '1.6', margin: '0 0 10px' }}>
+              {post.content}
+            </p>
+            <div style={{ display: 'flex', gap: '16px', fontSize: '12px', color: 'var(--text-muted)' }}>
+              <span>{new Date(post.createdAt).toLocaleDateString()}</span>
+              <span>❤️ {post.likeCount}</span>
+              <span>💬 {post.commentCount}</span>
+            </div>
+          </div>
+        ))
       )}
-
-      {posts.map(post => (
-        <PostCard
-          key={post.id}
-          post={post}
-          currentUser={user?.username}
-          onDelete={handleDeletePost}
-        />
-      ))}
     </div>
   );
 }

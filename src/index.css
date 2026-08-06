@@ -4,11 +4,52 @@
   box-sizing: border-box;
 }
 
+/* ── Light mode (default) ── */
+:root {
+  --bg-primary: #F3F2EF;
+  --bg-card: #ffffff;
+  --bg-secondary: #f9fafb;
+  --bg-hover: #f3f4f6;
+  --border: #e5e7eb;
+  --border-light: #f3f4f6;
+  --text-primary: #111827;
+  --text-secondary: #374151;
+  --text-muted: #6b7280;
+  --text-placeholder: #9ca3af;
+  --accent: #6366f1;
+  --accent-light: #eef2ff;
+  --accent-hover: #4f46e5;
+  --danger: #ef4444;
+  --success: #10b981;
+  --shadow: 0 1px 3px rgba(0,0,0,0.06);
+}
+
+/* ── Dark mode ── */
+[data-theme="dark"] {
+  --bg-primary: #0f172a;
+  --bg-card: #1e293b;
+  --bg-secondary: #1e293b;
+  --bg-hover: #334155;
+  --border: #334155;
+  --border-light: #1e293b;
+  --text-primary: #f1f5f9;
+  --text-secondary: #cbd5e1;
+  --text-muted: #94a3b8;
+  --text-placeholder: #64748b;
+  --accent: #818cf8;
+  --accent-light: #1e1b4b;
+  --accent-hover: #6366f1;
+  --danger: #f87171;
+  --success: #34d399;
+  --shadow: 0 1px 3px rgba(0,0,0,0.3);
+}
+
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  background: #F3F2EF;
-  color: #191919;
+  background: var(--bg-primary);
+  color: var(--text-primary);
   line-height: 1.5;
+  transition: background 0.2s, color 0.2s;
 }
 
 a {
@@ -34,19 +75,19 @@ input, textarea {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #d1d5db;
+  background: var(--border);
   border-radius: 99px;
 }
 
 .card {
-  background: white;
+  background: var(--bg-card);
   border-radius: 12px;
-  border: 1px solid #e5e7eb;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
 }
 
 .btn-primary {
-  background: #6366f1;
+  background: var(--accent);
   color: white;
   border: none;
   border-radius: 8px;
@@ -58,13 +99,13 @@ input, textarea {
 }
 
 .btn-primary:hover {
-  background: #4f46e5;
+  background: var(--accent-hover);
 }
 
 .btn-secondary {
-  background: white;
-  color: #374151;
-  border: 1px solid #d1d5db;
+  background: var(--bg-card);
+  color: var(--text-secondary);
+  border: 1px solid var(--border);
   border-radius: 8px;
   padding: 8px 18px;
   font-size: 14px;
@@ -74,12 +115,12 @@ input, textarea {
 }
 
 .btn-secondary:hover {
-  background: #f9fafb;
+  background: var(--bg-hover);
 }
 
 .avatar {
   border-radius: 50%;
-  background: #6366f1;
+  background: var(--accent);
   display: flex;
   align-items: center;
   justify-content: center;

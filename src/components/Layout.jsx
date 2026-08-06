@@ -8,6 +8,8 @@ import {
   Home, MessageSquare, Bell, User, Shield,
   LogOut, Search, Users
 } from 'lucide-react';
+import { useTheme } from '../context/ThemeContext';
+import { Sun, Moon } from 'lucide-react';
 
 export default function Layout({ children }) {
   const { user, logout } = useAuth();
@@ -19,6 +21,7 @@ export default function Layout({ children }) {
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
   const [showSearch, setShowSearch] = useState(false);
+  const { theme, toggleTheme } = useTheme();
 
   useEffect(() => {
     if (!user) return;
@@ -84,26 +87,45 @@ export default function Layout({ children }) {
   const isActive = (path) => location.pathname === path;
 
   const navItem = (to, icon, label, badge) => (
-    <Link to={to} style={{
-      display: 'flex', alignItems: 'center', gap: '12px',
-      padding: '10px 12px', borderRadius: '10px',
-      color: isActive(to) ? '#6366f1' : '#4b5563',
-      background: isActive(to) ? '#eef2ff' : 'transparent',
-      fontWeight: isActive(to) ? '600' : '400',
-      fontSize: '15px', transition: 'all 0.15s',
-      position: 'relative'
-    }}
-    onMouseEnter={e => { if (!isActive(to)) e.currentTarget.style.background = '#f9fafb'; }}
-    onMouseLeave={e => { if (!isActive(to)) e.currentTarget.style.background = 'transparent'; }}
+    <Link
+      to={to}
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: '12px',
+        padding: '10px 12px',
+        borderRadius: '10px',
+        color: isActive(to) ? 'var(--accent)' : 'var(--text-muted)',
+        background: isActive(to) ? 'var(--accent-light)' : 'transparent',
+        fontWeight: isActive(to) ? '600' : '400',
+        fontSize: '15px',
+        transition: 'all 0.15s',
+      }}
+      onMouseEnter={(e) => {
+        if (!isActive(to)) e.currentTarget.style.background = 'var(--bg-hover)';
+      }}
+      onMouseLeave={(e) => {
+        if (!isActive(to)) e.currentTarget.style.background = 'transparent';
+      }}
     >
       {icon}
       <span>{label}</span>
       {badge > 0 && (
-        <span style={{
-          marginLeft: 'auto', background: '#ef4444', color: 'white',
-          borderRadius: '99px', fontSize: '11px', fontWeight: '600',
-          padding: '1px 7px', minWidth: '20px', textAlign: 'center'
-        }}>{badge > 9 ? '9+' : badge}</span>
+        <span
+          style={{
+            marginLeft: 'auto',
+            background: 'var(--danger)',
+            color: 'var(--bg-card)',
+            borderRadius: '99px',
+            fontSize: '11px',
+            fontWeight: '600',
+            padding: '1px 7px',
+            minWidth: '20px',
+            textAlign: 'center',
+          }}
+        >
+          {badge > 9 ? '9+' : badge}
+        </span>
       )}
     </Link>
   );
@@ -118,7 +140,7 @@ export default function Layout({ children }) {
   };
 
   return (
-    <div style={{ display: 'flex', minHeight: '100vh', background: '#F3F2EF' }}>
+    <div style={{ display: 'flex', minHeight: '100vh', background: 'var(--bg-primary)' }}>
 
       {/* ── Left Sidebar ── */}
       <aside style={{
@@ -132,11 +154,11 @@ export default function Layout({ children }) {
           padding: '8px 12px', marginBottom: '16px'
         }}>
           <div style={{
-            width: '36px', height: '36px', background: '#6366f1',
+            width: '36px', height: '36px', background: 'var(--accent)',
             borderRadius: '10px', display: 'flex', alignItems: 'center',
-            justifyContent: 'center', color: 'white', fontWeight: '800', fontSize: '18px'
+            justifyContent: 'center', color: 'var(--bg-card)', fontWeight: '800', fontSize: '18px'
           }}>C</div>
-          <span style={{ fontWeight: '700', fontSize: '18px', color: '#111827' }}>
+          <span style={{ fontWeight: '700', fontSize: '18px', color: 'var(--text-primary)' }}>
             ConnectSphere
           </span>
         </Link>
@@ -146,7 +168,7 @@ export default function Layout({ children }) {
           <div style={{ position: 'relative' }}>
             <Search size={15} style={{
               position: 'absolute', left: '10px', top: '50%',
-              transform: 'translateY(-50%)', color: '#9ca3af'
+              transform: 'translateY(-50%)', color: 'var(--text-muted)'
             }} />
             <input
               value={searchQuery}
@@ -155,8 +177,8 @@ export default function Layout({ children }) {
               placeholder="Search users..."
               style={{
                 width: '100%', padding: '8px 12px 8px 32px',
-                borderRadius: '8px', border: '1px solid #e5e7eb',
-                background: '#f9fafb', fontSize: '13px', outline: 'none',
+                borderRadius: '8px', border: '1px solid var(--border)',
+                background: 'var(--bg-hover)', fontSize: '13px', outline: 'none',
                 boxSizing: 'border-box'
               }}
             />
@@ -164,7 +186,7 @@ export default function Layout({ children }) {
           {showSearch && searchResults.length > 0 && (
             <div style={{
               position: 'absolute', top: '40px', left: 0, right: 0,
-              background: 'white', border: '1px solid #e5e7eb',
+              background: 'var(--bg-card)', border: '1px solid var(--border)',
               borderRadius: '10px', boxShadow: '0 8px 24px rgba(0,0,0,0.1)',
               zIndex: 300, maxHeight: '250px', overflowY: 'auto'
             }}>
@@ -180,15 +202,15 @@ export default function Layout({ children }) {
                   display: 'flex', alignItems: 'center', gap: '10px',
                   padding: '10px 12px', cursor: 'pointer'
                 }}
-                onMouseEnter={e => e.currentTarget.style.background = '#f9fafb'}
-                onMouseLeave={e => e.currentTarget.style.background = 'white'}
+                onMouseEnter={e => e.currentTarget.style.background = 'var(--bg-hover)'}
+                onMouseLeave={e => e.currentTarget.style.background = 'var(--bg-card)'}
                 >
                   <div className="avatar" style={{ width: '30px', height: '30px', fontSize: '12px' }}>
                     {u.username?.charAt(0).toUpperCase()}
                   </div>
                   <div>
                     <div style={{ fontSize: '13px', fontWeight: '500' }}>@{u.username}</div>
-                    <div style={{ fontSize: '11px', color: '#9ca3af' }}>{u.followerCount} followers</div>
+                    <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>{u.followerCount} followers</div>
                   </div>
                 </div>
               ))}
@@ -206,18 +228,18 @@ export default function Layout({ children }) {
           <button onClick={handleBellClick} className="notif-bell" style={{
             width: '100%', display: 'flex', alignItems: 'center', gap: '12px',
             padding: '10px 12px', borderRadius: '10px', border: 'none',
-            background: showNotifs ? '#eef2ff' : 'transparent',
-            color: showNotifs ? '#6366f1' : '#4b5563',
+            background: showNotifs ? 'var(--accent-light)' : 'transparent',
+            color: showNotifs ? 'var(--accent)' : 'var(--text-muted)',
             fontSize: '15px', cursor: 'pointer', transition: 'all 0.15s'
           }}
-          onMouseEnter={e => { if (!showNotifs) e.currentTarget.style.background = '#f9fafb'; }}
+          onMouseEnter={e => { if (!showNotifs) e.currentTarget.style.background = 'var(--bg-hover)'; }}
           onMouseLeave={e => { if (!showNotifs) e.currentTarget.style.background = 'transparent'; }}
           >
             <Bell size={20} />
             <span>Notifications</span>
             {unreadCount > 0 && (
               <span style={{
-                marginLeft: 'auto', background: '#ef4444', color: 'white',
+                marginLeft: 'auto', background: 'var(--danger)', color: 'var(--bg-card)',
                 borderRadius: '99px', fontSize: '11px', fontWeight: '600',
                 padding: '1px 7px'
               }}>{unreadCount > 9 ? '9+' : unreadCount}</span>
@@ -227,8 +249,8 @@ export default function Layout({ children }) {
           {showNotifs && createPortal(
             <div className="notif-dropdown" style={{
               position: 'fixed', left: '252px', top: '80px',
-              width: '340px', background: 'white',
-              border: '1px solid #e5e7eb', borderRadius: '12px',
+              width: '340px', background: 'var(--bg-card)',
+              border: '1px solid var(--border)', borderRadius: '12px',
               boxShadow: '0 10px 30px rgba(0,0,0,0.12)', zIndex: 9999,
               maxHeight: '420px', overflowY: 'auto'
             }}>
@@ -240,25 +262,25 @@ export default function Layout({ children }) {
   <span>Notifications</span>
   <button onClick={() => setShowNotifs(false)} style={{
     background: 'none', border: 'none', cursor: 'pointer',
-    color: '#9ca3af', fontSize: '18px', lineHeight: '1', padding: '0 4px'
+    color: 'var(--text-muted)', fontSize: '18px', lineHeight: '1', padding: '0 4px'
   }}>×</button>
 </div>
               {notifications.length === 0 ? (
-                <div style={{ padding: '24px', textAlign: 'center', color: '#9ca3af', fontSize: '13px' }}>
+                <div style={{ padding: '24px', textAlign: 'center', color: 'var(--text-muted)', fontSize: '13px' }}>
                   No notifications yet
                 </div>
               ) : notifications.map((n) => (
                 <div key={n.id} style={{
-                  padding: '12px 16px', borderBottom: '1px solid #f9fafb',
+                  padding: '12px 16px', borderBottom: '1px solid var(--bg-hover)',
                   display: 'flex', alignItems: 'flex-start', gap: '10px',
-                  background: n.read ? 'white' : '#fafafe'
+                  background: n.read ? 'var(--bg-card)' : '#fafafe'
                 }}>
                   <div className="avatar" style={{ width: '36px', height: '36px', fontSize: '13px', flexShrink: 0 }}>
                     {n.actorUsername?.charAt(0).toUpperCase()}
                   </div>
                   <div style={{ flex: 1 }}>
                     <div style={{ fontSize: '13px' }}>{n.message}</div>
-                    <div style={{ fontSize: '11px', color: '#9ca3af', marginTop: '2px' }}>
+                    <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '2px' }}>
                       {formatTime(n.createdAt)}
                     </div>
                   </div>
@@ -277,29 +299,40 @@ export default function Layout({ children }) {
         {/* Spacer */}
         <div style={{ flex: 1 }} />
 
-        {/* User card at bottom */}
-        <div style={{
-          display: 'flex', alignItems: 'center', gap: '10px',
-          padding: '10px 12px', borderRadius: '10px',
-          border: '1px solid #e5e7eb', background: 'white', marginTop: '8px'
-        }}>
-          <div className="avatar" style={{ width: '36px', height: '36px', fontSize: '14px' }}>
-            {user?.username?.charAt(0).toUpperCase()}
-          </div>
-          <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{ fontSize: '13px', fontWeight: '600', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-              @{user?.username}
-            </div>
-            <div style={{ fontSize: '11px', color: '#9ca3af' }}>{user?.role}</div>
-          </div>
-          <button onClick={handleLogout} style={{
-            background: 'none', border: 'none', cursor: 'pointer',
-            color: '#9ca3af', padding: '4px'
-          }}>
-            <LogOut size={16} />
-          </button>
-        </div>
-      </aside>
+      {/* User card at bottom */}
+<div style={{
+  display: 'flex', alignItems: 'center', gap: '10px',
+  padding: '10px 12px', borderRadius: '10px',
+  border: '1px solid var(--border)',
+  background: 'var(--bg-card)', marginTop: '8px'
+}}>
+  <div className="avatar" style={{ width: '36px', height: '36px', fontSize: '14px' }}>
+    {user?.username?.charAt(0).toUpperCase()}
+  </div>
+  <div style={{ flex: 1, minWidth: 0 }}>
+    <div style={{
+      fontSize: '13px', fontWeight: '600',
+      overflow: 'hidden', textOverflow: 'ellipsis',
+      whiteSpace: 'nowrap', color: 'var(--text-primary)'
+    }}>
+      @{user?.username}
+    </div>
+    <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>{user?.role}</div>
+  </div>
+  <button onClick={toggleTheme} style={{
+    background: 'none', border: 'none', cursor: 'pointer',
+    color: 'var(--text-muted)', padding: '4px'
+  }}>
+    {theme === 'light' ? <Moon size={16} /> : <Sun size={16} />}
+  </button>
+  <button onClick={handleLogout} style={{
+    background: 'none', border: 'none', cursor: 'pointer',
+    color: 'var(--text-muted)', padding: '4px'
+  }}>
+    <LogOut size={16} />
+  </button>
+</div>
+</aside>
 
       {/* ── Main Content ── */}
       <main style={{ flex: 1, maxWidth: '960px', padding: '24px 16px' }}>
