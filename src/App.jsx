@@ -9,6 +9,7 @@ import Feed from './pages/Feed';
 import Chat from './pages/Chat';
 import Admin from './pages/Admin';
 import Layout from './components/Layout';
+import BlockedUsers from "./pages/BlockedUsers";
 
 const ProtectedRoute = ({ children }) => {
   const { user } = useAuth();
@@ -75,6 +76,7 @@ export default function App() {
               }
             />
             <Route path="/" element={<Navigate to="/feed" />} />
+            <Route path="/settings/blocked" element={<BlockedUsers />} />
           </Routes>
         </BrowserRouter>
       </AuthProvider>

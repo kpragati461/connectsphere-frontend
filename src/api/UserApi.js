@@ -7,3 +7,4 @@ export const searchUsers = (query) => api.get(`/api/users/search?query=${query}`
 export const getFollowing = () => api.get('/api/users/following');
 export const toggleBlock = (username) => api.post(`/api/users/${username}/block`);
 export const getBlockStatus = (username) => api.get(`/api/users/${username}/block-status`);
+export const getBlockedUsers = () => api.get('/api/users/blocked');

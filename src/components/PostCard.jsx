@@ -83,20 +83,20 @@ export default function PostCard({ post, currentUser, onDelete }) {
             {post.username?.charAt(0).toUpperCase()}
           </div>
           <div>
-            <div style={{ fontWeight: '600', fontSize: '14px', color: '#111827' }}>
+            <div style={{ fontWeight: '600', fontSize: '14px', color: 'var(--text-primary)' }}>
               @{post.username}
             </div>
-            <div style={{ fontSize: '12px', color: '#9ca3af' }}>{timeAgo(post.createdAt)} ago</div>
+            <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>{timeAgo(post.createdAt)} ago</div>
           </div>
         </div>
         {onDelete && post.username === currentUser && (
           <button onClick={() => onDelete(post.id)} style={{
             background: 'none', border: 'none', cursor: 'pointer',
-            color: '#d1d5db', padding: '4px', borderRadius: '6px',
+            color: 'var(--border)', padding: '4px', borderRadius: '6px',
             display: 'flex', alignItems: 'center'
           }}
-          onMouseEnter={e => e.currentTarget.style.color = '#ef4444'}
-          onMouseLeave={e => e.currentTarget.style.color = '#d1d5db'}
+          onMouseEnter={e => e.currentTarget.style.color = 'var(--danger)'}
+          onMouseLeave={e => e.currentTarget.style.color = 'var(--border)'}
           >
             <Trash2 size={15} />
           </button>
@@ -104,12 +104,12 @@ export default function PostCard({ post, currentUser, onDelete }) {
       </div>
 
       {/* Post content */}
-      <div style={{ padding: '0 16px 14px', fontSize: '15px', color: '#111827', lineHeight: '1.6' }}>
+      <div style={{ padding: '0 16px 14px', fontSize: '15px', color: 'var(--text-primary)', lineHeight: '1.6' }}>
         {post.content}
       </div>
 
       {/* Divider */}
-      <div style={{ borderTop: '1px solid #f3f4f6', margin: '0 16px' }} />
+      <div style={{ borderTop: '1px solid var(--border-light)', margin: '0 16px' }} />
 
       {/* Actions */}
       <div style={{ padding: '8px 8px', display: 'flex', gap: '4px' }}>
@@ -117,24 +117,24 @@ export default function PostCard({ post, currentUser, onDelete }) {
           display: 'flex', alignItems: 'center', gap: '6px',
           padding: '7px 12px', borderRadius: '8px', border: 'none',
           background: 'none', cursor: 'pointer', fontSize: '13px',
-          color: liked ? '#ef4444' : '#6b7280', fontWeight: liked ? '600' : '400',
+          color: liked ? 'var(--danger)' : 'var(--text-muted)', fontWeight: liked ? '600' : '400',
           transition: 'all 0.15s'
         }}
-        onMouseEnter={e => e.currentTarget.style.background = '#fef2f2'}
+        onMouseEnter={e => e.currentTarget.style.background = 'rgba(239,68,68,0.1)'}
         onMouseLeave={e => e.currentTarget.style.background = 'none'}
         >
-          <Heart size={17} fill={liked ? '#ef4444' : 'none'} />
+          <Heart size={17} fill={liked ? 'var(--danger)' : 'none'} />
           <span>{likeCount}</span>
         </button>
 
         <button onClick={handleShowComments} style={{
           display: 'flex', alignItems: 'center', gap: '6px',
           padding: '7px 12px', borderRadius: '8px', border: 'none',
-          background: showComments ? '#eef2ff' : 'none', cursor: 'pointer',
-          fontSize: '13px', color: showComments ? '#6366f1' : '#6b7280',
+          background: showComments ? 'var(--accent-light)' : 'none', cursor: 'pointer',
+          fontSize: '13px', color: showComments ? 'var(--accent)' : 'var(--text-muted)',
           transition: 'all 0.15s'
         }}
-        onMouseEnter={e => { if (!showComments) e.currentTarget.style.background = '#f5f3ff'; }}
+        onMouseEnter={e => { if (!showComments) e.currentTarget.style.background = 'var(--accent-light)'; }}
         onMouseLeave={e => { if (!showComments) e.currentTarget.style.background = 'none'; }}
         >
           <MessageCircle size={17} />
@@ -145,10 +145,10 @@ export default function PostCard({ post, currentUser, onDelete }) {
           display: 'flex', alignItems: 'center', gap: '6px',
           padding: '7px 12px', borderRadius: '8px', border: 'none',
           background: 'none', cursor: 'pointer', fontSize: '13px',
-          color: bookmarked ? '#f59e0b' : '#6b7280', fontWeight: bookmarked ? '600' : '400',
+          color: bookmarked ? '#f59e0b' : 'var(--text-muted)', fontWeight: bookmarked ? '600' : '400',
           transition: 'all 0.15s'
         }}
-        onMouseEnter={e => e.currentTarget.style.background = '#fff7ed'}
+        onMouseEnter={e => e.currentTarget.style.background = 'rgba(245,158,11,0.1)'}
         onMouseLeave={e => e.currentTarget.style.background = 'none'}
         >
           <Bookmark size={17} fill={bookmarked ? '#f59e0b' : 'none'} />
@@ -159,9 +159,9 @@ export default function PostCard({ post, currentUser, onDelete }) {
           display: 'flex', alignItems: 'center', gap: '6px',
           padding: '7px 12px', borderRadius: '8px', border: 'none',
           background: 'none', cursor: 'pointer', fontSize: '13px',
-          color: '#6b7280', transition: 'all 0.15s'
+          color: 'var(--text-muted)', transition: 'all 0.15s'
         }}
-        onMouseEnter={e => e.currentTarget.style.background = '#f9fafb'}
+        onMouseEnter={e => e.currentTarget.style.background = 'var(--bg-hover)'}
         onMouseLeave={e => e.currentTarget.style.background = 'none'}
         >
           <Share2 size={17} />
@@ -171,7 +171,7 @@ export default function PostCard({ post, currentUser, onDelete }) {
 
       {/* Comments */}
       {showComments && (
-        <div style={{ borderTop: '1px solid #f3f4f6', padding: '12px 16px', background: '#fafafa' }}>
+        <div style={{ borderTop: '1px solid var(--border-light)', padding: '12px 16px', background: 'var(--bg-secondary)' }}>
           {comments.map((c) => (
             <div key={c.id} style={{ display: 'flex', gap: '8px', marginBottom: '10px' }}>
               <div className="avatar" style={{
@@ -181,8 +181,8 @@ export default function PostCard({ post, currentUser, onDelete }) {
                 {c.username?.charAt(0).toUpperCase()}
               </div>
               <div style={{
-                background: 'white', borderRadius: '10px', padding: '8px 12px',
-                flex: 1, border: '1px solid #f3f4f6'
+                background: 'var(--bg-card)', borderRadius: '10px', padding: '8px 12px',
+                flex: 1, border: '1px solid var(--border-light)'
               }}>
                 <div style={{
                   display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2px'
@@ -193,16 +193,16 @@ export default function PostCard({ post, currentUser, onDelete }) {
                       onClick={() => handleDeleteComment(c.id)}
                       style={{
                         background: 'none', border: 'none', cursor: 'pointer',
-                        color: '#d1d5db', padding: '0 2px', display: 'flex', alignItems: 'center'
+                        color: 'var(--border)', padding: '0 2px', display: 'flex', alignItems: 'center'
                       }}
-                      onMouseEnter={e => e.currentTarget.style.color = '#ef4444'}
-                      onMouseLeave={e => e.currentTarget.style.color = '#d1d5db'}
+                      onMouseEnter={e => e.currentTarget.style.color = 'var(--danger)'}
+                      onMouseLeave={e => e.currentTarget.style.color = 'var(--border)'}
                     >
                       <Trash2 size={12} />
                     </button>
                   )}
                 </div>
-                <div style={{ fontSize: '13px', color: '#374151' }}>{c.content}</div>
+                <div style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>{c.content}</div>
               </div>
             </div>
           ))}
@@ -214,12 +214,12 @@ export default function PostCard({ post, currentUser, onDelete }) {
               placeholder="Write a comment..."
               style={{
                 flex: 1, padding: '8px 12px', borderRadius: '20px',
-                border: '1px solid #e5e7eb', fontSize: '13px',
-                outline: 'none', background: 'white'
+                border: '1px solid var(--border)', fontSize: '13px',
+                outline: 'none', background: 'var(--bg-secondary)', color: 'var(--text-primary)'
               }}
             />
             <button type="submit" style={{
-              background: '#6366f1', border: 'none', borderRadius: '50%',
+              background: 'var(--accent)', border: 'none', borderRadius: '50%',
               width: '34px', height: '34px', display: 'flex',
               alignItems: 'center', justifyContent: 'center', cursor: 'pointer',
               color: 'white', flexShrink: 0

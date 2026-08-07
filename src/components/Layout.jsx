@@ -218,10 +218,11 @@ export default function Layout({ children }) {
           )}
         </div>
 
-        {/* Nav items */}
-        {navItem('/feed', <Home size={20} />, 'Feed')}
-        {navItem('/chat', <MessageSquare size={20} />, 'Messages')}
-        {navItem('/profile', <User size={20} />, 'Profile')}
+
+         {navItem('/feed', <Home size={20} />, 'Feed')}
+         {navItem('/chat', <MessageSquare size={20} />, 'Messages')}
+         {navItem('/profile', <User size={20} />, 'Profile')}
+         {navItem('/settings/blocked', <Users size={20} />, 'Blocked Users')}
 
         {/* Notifications */}
         <div style={{ position: 'relative' }}>

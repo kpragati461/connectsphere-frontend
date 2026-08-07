@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useParams, useNavigate } from 'react-router-dom';
-import { getMyProfile, getUserProfile, updateMyProfile, toggleFollow, toggleBlock, getBlockStatus } from '../api/userApi';
+import { getMyProfile, getUserProfile, updateMyProfile, toggleFollow, toggleBlock, getBlockStatus } from '../api/UserApi';
 import { getUserPosts, getSavedPosts, deletePost } from '../api/postApi';
 import { Edit3, Check, X, Bookmark } from 'lucide-react';
+import PostCard from '../components/PostCard';
 
 export default function Profile() {
   const { user } = useAuth();
@@ -272,17 +273,12 @@ export default function Profile() {
             <Bookmark size={16} /> Saved Posts
           </div>
           {savedPosts.map(post => (
-            <div key={post.id} className="card" style={{ padding: '16px', marginBottom: '10px' }}>
-              <p style={{ fontSize: '15px', color: 'var(--text-primary)', lineHeight: '1.6', margin: '0 0 10px' }}>
-                {post.content}
-              </p>
-              <div style={{ display: 'flex', gap: '16px', fontSize: '12px', color: 'var(--text-muted)' }}>
-                <span>By @{post.username}</span>
-                <span>{new Date(post.createdAt).toLocaleDateString()}</span>
-                <span>❤️ {post.likeCount}</span>
-                <span>💬 {post.commentCount}</span>
-              </div>
-            </div>
+            <PostCard
+              key={post.id}
+              post={post}
+              currentUser={user?.username}
+              onDelete={handleDeletePost}
+            />
           ))}
         </div>
       )}
@@ -308,16 +304,12 @@ export default function Profile() {
         </div>
       ) : (
         posts.map(post => (
-          <div key={post.id} className="card" style={{ padding: '16px', marginBottom: '10px' }}>
-            <p style={{ fontSize: '15px', color: 'var(--text-primary)', lineHeight: '1.6', margin: '0 0 10px' }}>
-              {post.content}
-            </p>
-            <div style={{ display: 'flex', gap: '16px', fontSize: '12px', color: 'var(--text-muted)' }}>
-              <span>{new Date(post.createdAt).toLocaleDateString()}</span>
-              <span>❤️ {post.likeCount}</span>
-              <span>💬 {post.commentCount}</span>
-            </div>
-          </div>
+          <PostCard
+            key={post.id}
+            post={post}
+            currentUser={user?.username}
+            onDelete={handleDeletePost}
+          />
         ))
       )}
     </div>

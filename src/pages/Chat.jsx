@@ -117,31 +117,31 @@ export default function Chat() {
   return (
     <div style={{
       display: 'flex', height: 'calc(100vh - 48px)',
-      background: 'white', borderRadius: '12px',
-      border: '1px solid #e5e7eb', overflow: 'hidden',
+      background: 'var(--bg-card)', borderRadius: '12px',
+      border: '1px solid var(--border)', overflow: 'hidden',
       boxShadow: '0 1px 3px rgba(0,0,0,0.06)'
     }}>
 
       {/* Left — conversation list */}
       <div style={{
         width: '280px', flexShrink: 0,
-        borderRight: '1px solid #f3f4f6',
+        borderRight: '1px solid var(--border-light)',
         display: 'flex', flexDirection: 'column'
       }}>
         {/* Header */}
         <div style={{
-          padding: '16px', borderBottom: '1px solid #f3f4f6',
+          padding: '16px', borderBottom: '1px solid var(--border-light)',
           display: 'flex', alignItems: 'center', justifyContent: 'space-between'
         }}>
-          <h3 style={{ margin: 0, fontSize: '16px', fontWeight: '700' }}>Messages</h3>
+          <h3 style={{ margin: 0, fontSize: '16px', fontWeight: '700', color: 'var(--text-primary)' }}>Messages</h3>
           <button
             onClick={() => setShowNewChat(!showNewChat)}
             style={{
               width: '32px', height: '32px', borderRadius: '8px',
-              background: showNewChat ? '#eef2ff' : '#f9fafb',
-              border: '1px solid #e5e7eb', display: 'flex',
+              background: showNewChat ? 'var(--accent-light)' : 'var(--bg-hover)',
+              border: '1px solid var(--border)', display: 'flex',
               alignItems: 'center', justifyContent: 'center',
-              cursor: 'pointer', color: showNewChat ? '#6366f1' : '#6b7280'
+              cursor: 'pointer', color: showNewChat ? 'var(--accent)' : 'var(--text-muted)'
             }}
           >
             <Plus size={16} />
@@ -150,7 +150,7 @@ export default function Chat() {
 
         {/* New chat form */}
         {showNewChat && (
-          <div style={{ padding: '12px', borderBottom: '1px solid #f3f4f6', background: '#fafafa' }}>
+          <div style={{ padding: '12px', borderBottom: '1px solid var(--border-light)', background: 'var(--bg-secondary)' }}>
             <form onSubmit={handleStartConversation} style={{ display: 'flex', gap: '6px' }}>
               <input
                 value={searchUsername}
@@ -158,24 +158,25 @@ export default function Chat() {
                 placeholder="Username..."
                 style={{
                   flex: 1, padding: '7px 10px', borderRadius: '8px',
-                  border: '1px solid #e5e7eb', fontSize: '13px', outline: 'none'
+                  border: '1px solid var(--border)', fontSize: '13px', outline: 'none',
+                  background: 'var(--bg-card)', color: 'var(--text-primary)'
                 }}
-                onFocus={e => e.target.style.borderColor = '#6366f1'}
-                onBlur={e => e.target.style.borderColor = '#e5e7eb'}
+                onFocus={e => e.target.style.borderColor = 'var(--accent)'}
+                onBlur={e => e.target.style.borderColor = 'var(--border)'}
               />
               <button type="submit" style={{
-                padding: '7px 12px', background: '#6366f1', color: 'white',
+                padding: '7px 12px', background: 'var(--accent)', color: 'white',
                 border: 'none', borderRadius: '8px', cursor: 'pointer', fontSize: '13px'
               }}>Go</button>
             </form>
-            {error && <p style={{ color: '#ef4444', fontSize: '12px', margin: '6px 0 0' }}>{error}</p>}
+            {error && <p style={{ color: 'var(--danger)', fontSize: '12px', margin: '6px 0 0' }}>{error}</p>}
           </div>
         )}
 
         {/* Conversation list */}
         <div style={{ flex: 1, overflowY: 'auto' }}>
           {conversations.length === 0 && (
-            <div style={{ padding: '32px 16px', textAlign: 'center', color: '#9ca3af' }}>
+            <div style={{ padding: '32px 16px', textAlign: 'center', color: 'var(--text-muted)' }}>
               <MessageSquare size={32} style={{ margin: '0 auto 8px', opacity: 0.4 }} />
               <div style={{ fontSize: '13px' }}>No conversations yet</div>
               <div style={{ fontSize: '12px', marginTop: '4px' }}>Click + to start one</div>
@@ -187,13 +188,13 @@ export default function Chat() {
               onClick={() => openConversation(conv.id)}
               style={{
                 padding: '12px 16px', cursor: 'pointer',
-                background: activeConvId === conv.id ? '#eef2ff' : 'white',
-                borderBottom: '1px solid #f9fafb',
+                background: activeConvId === conv.id ? 'var(--accent-light)' : 'var(--bg-card)',
+                borderBottom: '1px solid var(--border-light)',
                 display: 'flex', alignItems: 'center', gap: '10px',
                 transition: 'background 0.15s'
               }}
-              onMouseEnter={e => { if (activeConvId !== conv.id) e.currentTarget.style.background = '#f9fafb'; }}
-              onMouseLeave={e => { if (activeConvId !== conv.id) e.currentTarget.style.background = 'white'; }}
+              onMouseEnter={e => { if (activeConvId !== conv.id) e.currentTarget.style.background = 'var(--bg-hover)'; }}
+              onMouseLeave={e => { if (activeConvId !== conv.id) e.currentTarget.style.background = 'var(--bg-card)'; }}
             >
               <div className="avatar" style={{
                 width: '40px', height: '40px', fontSize: '15px', flexShrink: 0,
@@ -204,13 +205,13 @@ export default function Chat() {
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{
                   fontWeight: activeConvId === conv.id ? '600' : '500',
-                  fontSize: '14px', color: '#111827',
+                  fontSize: '14px', color: 'var(--text-primary)',
                   display: 'flex', justifyContent: 'space-between'
                 }}>
                   <span>@{conv.otherUsername}</span>
                 </div>
                 <div style={{
-                  fontSize: '12px', color: '#9ca3af', marginTop: '2px',
+                  fontSize: '12px', color: 'var(--text-muted)', marginTop: '2px',
                   overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap'
                 }}>
                   {conv.lastMessage}
@@ -218,7 +219,7 @@ export default function Chat() {
               </div>
               {conv.unreadCount > 0 && (
                 <span style={{
-                  background: '#6366f1', color: 'white', borderRadius: '99px',
+                  background: 'var(--accent)', color: 'white', borderRadius: '99px',
                   fontSize: '10px', fontWeight: '600', padding: '2px 7px', flexShrink: 0
                 }}>
                   {conv.unreadCount}
@@ -234,10 +235,10 @@ export default function Chat() {
         {!activeConvId ? (
           <div style={{
             flex: 1, display: 'flex', flexDirection: 'column',
-            alignItems: 'center', justifyContent: 'center', color: '#9ca3af'
+            alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)'
           }}>
             <MessageSquare size={48} style={{ marginBottom: '16px', opacity: 0.3 }} />
-            <div style={{ fontWeight: '500', fontSize: '16px', marginBottom: '6px', color: '#374151' }}>
+            <div style={{ fontWeight: '500', fontSize: '16px', marginBottom: '6px', color: 'var(--text-secondary)' }}>
               Your messages
             </div>
             <div style={{ fontSize: '13px' }}>Select a conversation or start a new one</div>
@@ -246,8 +247,8 @@ export default function Chat() {
           <>
             {/* Chat header */}
             <div style={{
-              padding: '14px 20px', borderBottom: '1px solid #f3f4f6',
-              display: 'flex', alignItems: 'center', gap: '12px', background: 'white'
+              padding: '14px 20px', borderBottom: '1px solid var(--border-light)',
+              display: 'flex', alignItems: 'center', gap: '12px', background: 'var(--bg-card)'
             }}>
               <div className="avatar" style={{
                 width: '38px', height: '38px', fontSize: '14px',
@@ -257,12 +258,12 @@ export default function Chat() {
               </div>
               <div>
                 <div style={{ fontWeight: '600', fontSize: '14px' }}>@{activeConv?.otherUsername}</div>
-                <div style={{ fontSize: '12px', color: '#10b981' }}>Active now</div>
+                <div style={{ fontSize: '12px', color: 'var(--success)' }}>Active now</div>
               </div>
             </div>
 
             {/* Messages */}
-            <div style={{ flex: 1, overflowY: 'auto', overflowX: 'hidden', padding: '16px', background: '#fafafa' }}>
+            <div style={{ flex: 1, overflowY: 'auto', overflowX: 'hidden', padding: '16px', background: 'var(--bg-secondary)' }}>
               {messages.map((msg, i) => {
                 const isOwn = msg.senderUsername === user?.username;
                 const showAvatar = i === 0 || messages[i-1]?.senderUsername !== msg.senderUsername;
@@ -291,9 +292,9 @@ export default function Chat() {
                     <div style={{
                       maxWidth: '65%', padding: '9px 14px',
                       borderRadius: isOwn ? '18px 18px 4px 18px' : '18px 18px 18px 4px',
-                      background: isOwn ? '#6366f1' : 'white',
-                      color: isOwn ? 'white' : '#111827',
-                      border: isOwn ? 'none' : '1px solid #e5e7eb',
+                      background: isOwn ? 'var(--accent)' : 'var(--bg-card)',
+                      color: isOwn ? 'white' : 'var(--text-primary)',
+                      border: isOwn ? 'none' : '1px solid var(--border)',
                       fontSize: '14px', lineHeight: '1.4',
                       boxShadow: '0 1px 2px rgba(0,0,0,0.05)',
                       overflowWrap: 'anywhere', wordBreak: 'break-word', minWidth: 0
@@ -303,15 +304,15 @@ export default function Chat() {
                           <div style={{
                             display: 'flex', alignItems: 'center', gap: '5px',
                             fontSize: '10px', fontWeight: '700', marginBottom: '6px',
-                            color: isOwn ? 'rgba(255,255,255,0.85)' : '#6366f1',
+                            color: isOwn ? 'rgba(255,255,255,0.85)' : 'var(--accent)',
                             textTransform: 'uppercase', letterSpacing: '0.04em'
                           }}>
                             <Bookmark size={11} /> Shared post
                           </div>
                           <div style={{
                             borderRadius: '10px', padding: '8px 10px',
-                            background: isOwn ? 'rgba(255,255,255,0.15)' : '#f9fafb',
-                            border: isOwn ? 'none' : '1px solid #e5e7eb',
+                            background: isOwn ? 'rgba(255,255,255,0.15)' : 'var(--bg-hover)',
+                            border: isOwn ? 'none' : '1px solid var(--border)',
                             fontSize: '13px', lineHeight: '1.4',
                             overflowWrap: 'anywhere', wordBreak: 'break-word'
                           }}>
@@ -323,7 +324,7 @@ export default function Chat() {
                       )}
                       <div style={{
                         fontSize: '10px', marginTop: '4px',
-                        color: isOwn ? 'rgba(255,255,255,0.65)' : '#9ca3af',
+                        color: isOwn ? 'rgba(255,255,255,0.65)' : 'var(--text-muted)',
                         textAlign: 'right'
                       }}>
                         {formatTime(msg.createdAt)}
@@ -336,7 +337,7 @@ export default function Chat() {
             </div>
 
             {/* Input */}
-            <div style={{ padding: '12px 16px', background: 'white', borderTop: '1px solid #f3f4f6' }}>
+            <div style={{ padding: '12px 16px', background: 'var(--bg-card)', borderTop: '1px solid var(--border-light)' }}>
               <form onSubmit={handleSend} style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
                 <input
                   value={newMessage}
@@ -344,19 +345,19 @@ export default function Chat() {
                   placeholder="Type a message..."
                   style={{
                     flex: 1, padding: '10px 16px', borderRadius: '24px',
-                    border: '1px solid #e5e7eb', fontSize: '14px',
-                    outline: 'none', background: '#f9fafb',
+                    border: '1px solid var(--border)', fontSize: '14px',
+                    outline: 'none', background: 'var(--bg-hover)', color: 'var(--text-primary)',
                     transition: 'border-color 0.15s'
                   }}
-                  onFocus={e => e.target.style.borderColor = '#6366f1'}
-                  onBlur={e => e.target.style.borderColor = '#e5e7eb'}
+                  onFocus={e => e.target.style.borderColor = 'var(--accent)'}
+                  onBlur={e => e.target.style.borderColor = 'var(--border)'}
                 />
                 <button type="submit" style={{
                   width: '40px', height: '40px', borderRadius: '50%',
-                  background: newMessage.trim() ? '#6366f1' : '#e5e7eb',
+                  background: newMessage.trim() ? 'var(--accent)' : 'var(--bg-hover)',
                   border: 'none', display: 'flex', alignItems: 'center',
                   justifyContent: 'center', cursor: 'pointer', flexShrink: 0,
-                  transition: 'background 0.15s', color: newMessage.trim() ? 'white' : '#9ca3af'
+                  transition: 'background 0.15s', color: newMessage.trim() ? 'white' : 'var(--text-muted)'
                 }}>
                   <Send size={16} />
                 </button>

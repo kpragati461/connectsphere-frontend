@@ -114,22 +114,22 @@ export default function ShareModal({ post, onClose }) {
       <div
         onClick={e => e.stopPropagation()}
         style={{
-          background: 'white', borderRadius: '16px', width: '100%', maxWidth: '380px',
+          background: 'var(--bg-card)', borderRadius: '16px', width: '100%', maxWidth: '380px',
           maxHeight: '80vh', display: 'flex', flexDirection: 'column', overflow: 'hidden',
           boxShadow: '0 10px 40px rgba(0,0,0,0.2)'
         }}
       >
         {/* Header */}
         <div style={{
-          padding: '16px', borderBottom: '1px solid #f3f4f6',
+          padding: '16px', borderBottom: '1px solid var(--border-light)',
           display: 'flex', alignItems: 'center', justifyContent: 'space-between'
         }}>
-          <h3 style={{ margin: 0, fontSize: '16px', fontWeight: '700' }}>Share post</h3>
+          <h3 style={{ margin: 0, fontSize: '16px', fontWeight: '700', color: 'var(--text-primary)' }}>Share post</h3>
           <button
             onClick={onClose}
             style={{
               background: 'none', border: 'none', cursor: 'pointer',
-              color: '#9ca3af', display: 'flex', alignItems: 'center', padding: 0
+              color: 'var(--text-muted)', display: 'flex', alignItems: 'center', padding: 0
             }}
           >
             <X size={20} />
@@ -137,18 +137,18 @@ export default function ShareModal({ post, onClose }) {
         </div>
 
         {/* Search */}
-        <div style={{ padding: '12px 16px', borderBottom: '1px solid #f3f4f6' }}>
+        <div style={{ padding: '12px 16px', borderBottom: '1px solid var(--border-light)' }}>
           <div style={{
             display: 'flex', alignItems: 'center', gap: '8px',
-            background: '#f9fafb', border: '1px solid #e5e7eb',
+            background: 'var(--bg-hover)', border: '1px solid var(--border)',
             borderRadius: '10px', padding: '8px 12px'
           }}>
-            <Search size={15} color="#9ca3af" />
+            <Search size={15} color="var(--text-muted)" />
             <input
               value={query}
               onChange={e => handleQueryChange(e.target.value)}
               placeholder="Search people..."
-              style={{ border: 'none', outline: 'none', background: 'none', fontSize: '13px', flex: 1 }}
+              style={{ border: 'none', outline: 'none', background: 'none', fontSize: '13px', flex: 1, color: 'var(--text-primary)' }}
             />
           </div>
         </div>
@@ -156,13 +156,13 @@ export default function ShareModal({ post, onClose }) {
         {/* People list */}
         <div style={{ flex: 1, overflowY: 'auto', padding: '4px 8px', minHeight: '160px' }}>
           {loading && (
-            <div style={{ padding: '32px', textAlign: 'center', color: '#9ca3af', fontSize: '13px' }}>
+            <div style={{ padding: '32px', textAlign: 'center', color: 'var(--text-muted)', fontSize: '13px' }}>
               Loading...
             </div>
           )}
 
           {!loading && people.length === 0 && (
-            <div style={{ padding: '32px 16px', textAlign: 'center', color: '#9ca3af', fontSize: '13px' }}>
+            <div style={{ padding: '32px 16px', textAlign: 'center', color: 'var(--text-muted)', fontSize: '13px' }}>
               {query ? 'No users found' : "You're not following anyone yet — try searching"}
             </div>
           )}
@@ -179,7 +179,7 @@ export default function ShareModal({ post, onClose }) {
                   padding: '10px 8px', borderRadius: '10px',
                   cursor: isSent ? 'default' : 'pointer',
                   opacity: isSent ? 0.6 : 1,
-                  background: isSelected ? '#eef2ff' : 'transparent'
+                  background: isSelected ? 'var(--accent-light)' : 'transparent'
                 }}
               >
                 <div className="avatar" style={{
@@ -189,17 +189,17 @@ export default function ShareModal({ post, onClose }) {
                   {person.username?.charAt(0).toUpperCase()}
                 </div>
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontWeight: '600', fontSize: '14px', color: '#111827' }}>
+                  <div style={{ fontWeight: '600', fontSize: '14px', color: 'var(--text-primary)' }}>
                     @{person.username}
                   </div>
                   {isSent && (
-                    <div style={{ fontSize: '11px', color: '#10b981' }}>Sent</div>
+                    <div style={{ fontSize: '11px', color: 'var(--success)' }}>Sent</div>
                   )}
                 </div>
                 <div style={{
                   width: '22px', height: '22px', borderRadius: '50%',
-                  border: (isSelected || isSent) ? 'none' : '1.5px solid #d1d5db',
-                  background: (isSelected || isSent) ? '#6366f1' : 'transparent',
+                  border: (isSelected || isSent) ? 'none' : '1.5px solid var(--border)',
+                  background: (isSelected || isSent) ? 'var(--accent)' : 'transparent',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                   flexShrink: 0
                 }}>
@@ -211,18 +211,18 @@ export default function ShareModal({ post, onClose }) {
         </div>
 
         {error && (
-          <div style={{ padding: '4px 16px 0', color: '#ef4444', fontSize: '12px' }}>{error}</div>
+          <div style={{ padding: '4px 16px 0', color: 'var(--danger)', fontSize: '12px' }}>{error}</div>
         )}
 
         {/* Footer */}
-        <div style={{ padding: '12px 16px', borderTop: '1px solid #f3f4f6' }}>
+        <div style={{ padding: '12px 16px', borderTop: '1px solid var(--border-light)' }}>
           <button
             onClick={handleSend}
             disabled={selected.size === 0 || sending}
             style={{
               width: '100%', padding: '11px', borderRadius: '10px', border: 'none',
-              background: selected.size === 0 || sending ? '#e5e7eb' : '#6366f1',
-              color: selected.size === 0 || sending ? '#9ca3af' : 'white',
+              background: selected.size === 0 || sending ? 'var(--bg-hover)' : 'var(--accent)',
+              color: selected.size === 0 || sending ? 'var(--text-muted)' : 'white',
               fontWeight: '600', fontSize: '14px',
               cursor: selected.size === 0 || sending ? 'default' : 'pointer'
             }}
@@ -234,7 +234,7 @@ export default function ShareModal({ post, onClose }) {
             onClick={handleCopyLink}
             style={{
               width: '100%', marginTop: '8px', padding: '9px', borderRadius: '10px',
-              border: 'none', background: 'none', color: '#6366f1',
+              border: 'none', background: 'none', color: 'var(--accent)',
               fontWeight: '500', fontSize: '13px', cursor: 'pointer',
               display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px'
             }}
