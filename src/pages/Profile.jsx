@@ -5,6 +5,7 @@ import { getMyProfile, getUserProfile, updateMyProfile, toggleFollow, toggleBloc
 import { getUserPosts, getSavedPosts, deletePost } from '../api/postApi';
 import { Edit3, Check, X, Bookmark } from 'lucide-react';
 import PostCard from '../components/PostCard';
+import FollowListModal from '../components/FollowListModal';
 
 export default function Profile() {
   const { user } = useAuth();
@@ -25,6 +26,7 @@ export default function Profile() {
   const [followerCount, setFollowerCount] = useState(0);
   const [blocked, setBlocked] = useState(false);
   const [postsBlocked, setPostsBlocked] = useState(false);
+  const [openList, setOpenList] = useState(null); // 'followers' | 'following' | null
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -248,16 +250,26 @@ export default function Profile() {
             display: 'flex', gap: '24px', paddingTop: '12px',
             borderTop: '1px solid var(--border-light)'
           }}>
-            {[
-              { label: 'Posts', value: posts?.length ?? 0 },
-              { label: 'Followers', value: followerCount },
-              { label: 'Following', value: profile.followingCount },
-            ].map(stat => (
-              <div key={stat.label}>
-                <div style={{ fontWeight: '700', fontSize: '18px', color: 'var(--text-primary)' }}>{stat.value}</div>
-                <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>{stat.label}</div>
+            <div>
+              <div style={{ fontWeight: '700', fontSize: '18px', color: 'var(--text-primary)' }}>
+                {posts?.length ?? 0}
               </div>
-            ))}
+              <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>Posts</div>
+            </div>
+
+            <div onClick={() => setOpenList('followers')} style={{ cursor: 'pointer' }}>
+              <div style={{ fontWeight: '700', fontSize: '18px', color: 'var(--text-primary)' }}>
+                {followerCount}
+              </div>
+              <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>Followers</div>
+            </div>
+
+            <div onClick={() => setOpenList('following')} style={{ cursor: 'pointer' }}>
+              <div style={{ fontWeight: '700', fontSize: '18px', color: 'var(--text-primary)' }}>
+                {profile.followingCount}
+              </div>
+              <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>Following</div>
+            </div>
           </div>
         </div>
       </div>
@@ -311,6 +323,15 @@ export default function Profile() {
             onDelete={handleDeletePost}
           />
         ))
+      )}
+
+      {/* Followers / Following modal */}
+      {openList && (
+        <FollowListModal
+          username={profileUsername}
+          type={openList}
+          onClose={() => setOpenList(null)}
+        />
       )}
     </div>
   );
