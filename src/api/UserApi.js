@@ -10,3 +10,5 @@ export const getBlockStatus = (username) => api.get(`/api/users/${username}/bloc
 export const getBlockedUsers = () => api.get('/api/users/blocked');
 export const getFollowers = (username) => api.get(`/api/users/${username}/followers`);
 export const getFollowingList = (username) => api.get(`/api/users/${username}/following-list`);
+export const changePassword = (data) => api.post('/api/users/me/change-password', data);
+export const verifyPassword = (currentPassword) => api.post('/api/users/me/verify-password', { currentPassword });

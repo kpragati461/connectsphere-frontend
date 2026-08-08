@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
-import { getBlockedUsers, toggleBlock } from '../api/UserApi';
+import { getBlockedUsers, toggleBlock } from '../../api/UserApi';
 
-export default function BlockedUsers() {
+export default function BlockedUsersSection() {
   const [blocked, setBlocked] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -18,7 +18,7 @@ export default function BlockedUsers() {
       const res = await getBlockedUsers();
       setBlocked(res.data);
     } catch (err) {
-      setError('Failed to load blocked users');
+      setError(`Failed to load blocked users (${err.response?.status || 'network error'})`);
     } finally {
       setLoading(false);
     }
@@ -29,34 +29,31 @@ export default function BlockedUsers() {
     try {
       await toggleBlock(username);
       setBlocked((prev) => prev.filter((u) => u !== username));
-    } catch (err) {
+    } catch {
       setError('Failed to unblock user');
     } finally {
       setPendingUser(null);
     }
   };
 
-  if (loading) return <div style={{ padding: '24px', color: 'var(--text-muted)' }}>Loading…</div>;
-
   return (
-    <div style={{ padding: '24px', maxWidth: '480px' }}>
-      <h2 style={{ fontSize: '18px', fontWeight: '600', marginBottom: '16px', color: 'var(--text-primary)' }}>
+    <div>
+      <h3 style={{ fontSize: '16px', fontWeight: '600', marginBottom: '16px', color: 'var(--text-primary)' }}>
         Blocked Users
-      </h2>
+      </h3>
 
-      {error && (
-        <div style={{ color: '#ef4444', marginBottom: '16px', fontSize: '13px' }}>{error}</div>
-      )}
+      {error && <div style={{ color: '#ef4444', marginBottom: '16px', fontSize: '13px' }}>{error}</div>}
 
-      {blocked.length === 0 ? (
+      {loading ? (
+        <div style={{ color: 'var(--text-muted)', fontSize: '13px' }}>Loading…</div>
+      ) : blocked.length === 0 ? (
         <p style={{ color: 'var(--text-muted)', fontSize: '14px' }}>You haven't blocked anyone.</p>
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
           {blocked.map((username) => (
             <div key={username} style={{
               display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-              padding: '12px 16px', borderRadius: '10px',
-              border: '1px solid var(--border)', background: 'var(--bg-card)'
+              padding: '12px 16px', borderRadius: '10px', border: '1px solid var(--border)'
             }}>
               <span style={{ color: 'var(--text-primary)', fontSize: '14px' }}>@{username}</span>
               <button

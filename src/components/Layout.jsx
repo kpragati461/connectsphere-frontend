@@ -6,7 +6,7 @@ import { getUnreadCount, getNotifications, markAllAsRead } from '../api/Notifica
 import { searchUsers } from '../api/UserApi';
 import {
   Home, MessageSquare, Bell, User, Shield,
-  LogOut, Search, Users
+  LogOut, Search, Users, Settings as SettingsIcon
 } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
 import { Sun, Moon } from 'lucide-react';
@@ -222,7 +222,7 @@ export default function Layout({ children }) {
          {navItem('/feed', <Home size={20} />, 'Feed')}
          {navItem('/chat', <MessageSquare size={20} />, 'Messages')}
          {navItem('/profile', <User size={20} />, 'Profile')}
-         {navItem('/settings/blocked', <Users size={20} />, 'Blocked Users')}
+         {navItem('/settings', <SettingsIcon size={20} />, 'Settings')}
 
         {/* Notifications */}
         <div style={{ position: 'relative' }}>
