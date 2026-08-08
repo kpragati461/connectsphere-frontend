@@ -197,11 +197,15 @@ export default function Chat() {
               onMouseLeave={e => { if (activeConvId !== conv.id) e.currentTarget.style.background = 'var(--bg-card)'; }}
             >
               <div className="avatar" style={{
-                width: '40px', height: '40px', fontSize: '15px', flexShrink: 0,
-                background: `hsl(${conv.otherUsername?.charCodeAt(0) * 10}, 65%, 55%)`
-              }}>
-                {conv.otherUsername?.charAt(0).toUpperCase()}
-              </div>
+  width: '40px', height: '40px', fontSize: '15px', flexShrink: 0, overflow: 'hidden',
+  background: conv.otherProfilePhoto ? 'transparent' : `hsl(${conv.otherUsername?.charCodeAt(0) * 10}, 65%, 55%)`
+}}>
+  {conv.otherProfilePhoto ? (
+    <img src={conv.otherProfilePhoto} alt={conv.otherUsername} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+  ) : (
+    conv.otherUsername?.charAt(0).toUpperCase()
+  )}
+</div>
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{
                   fontWeight: activeConvId === conv.id ? '600' : '500',
@@ -250,12 +254,16 @@ export default function Chat() {
               padding: '14px 20px', borderBottom: '1px solid var(--border-light)',
               display: 'flex', alignItems: 'center', gap: '12px', background: 'var(--bg-card)'
             }}>
-              <div className="avatar" style={{
-                width: '38px', height: '38px', fontSize: '14px',
-                background: `hsl(${activeConv?.otherUsername?.charCodeAt(0) * 10}, 65%, 55%)`
-              }}>
-                {activeConv?.otherUsername?.charAt(0).toUpperCase()}
-              </div>
+<div className="avatar" style={{
+  width: '38px', height: '38px', fontSize: '14px', overflow: 'hidden',
+  background: activeConv?.otherProfilePhoto ? 'transparent' : `hsl(${activeConv?.otherUsername?.charCodeAt(0) * 10}, 65%, 55%)`
+}}>
+  {activeConv?.otherProfilePhoto ? (
+    <img src={activeConv.otherProfilePhoto} alt={activeConv.otherUsername} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+  ) : (
+    activeConv?.otherUsername?.charAt(0).toUpperCase()
+  )}
+</div>
               <div>
                 <div style={{ fontWeight: '600', fontSize: '14px' }}>@{activeConv?.otherUsername}</div>
                 <div style={{ fontSize: '12px', color: 'var(--success)' }}>Active now</div>
@@ -282,12 +290,16 @@ export default function Chat() {
                   }}>
                     {!isOwn && (
                       <div className="avatar" style={{
-                        width: '28px', height: '28px', fontSize: '11px', flexShrink: 0,
-                        visibility: showAvatar ? 'visible' : 'hidden',
-                        background: `hsl(${msg.senderUsername?.charCodeAt(0) * 10}, 65%, 55%)`
-                      }}>
-                        {msg.senderUsername?.charAt(0).toUpperCase()}
-                      </div>
+  width: '28px', height: '28px', fontSize: '11px', flexShrink: 0, overflow: 'hidden',
+  visibility: showAvatar ? 'visible' : 'hidden',
+  background: msg.senderProfilePhoto ? 'transparent' : `hsl(${msg.senderUsername?.charCodeAt(0) * 10}, 65%, 55%)`
+}}>
+  {msg.senderProfilePhoto ? (
+    <img src={msg.senderProfilePhoto} alt={msg.senderUsername} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+  ) : (
+    msg.senderUsername?.charAt(0).toUpperCase()
+  )}
+</div>
                     )}
                     <div style={{
                       maxWidth: '65%', padding: '9px 14px',

@@ -99,13 +99,21 @@ export default function FollowListModal({ username, type, onClose }) {
                 display: 'flex', alignItems: 'center', gap: '10px',
                 padding: '10px', borderRadius: '10px'
               }}>
-                <div
-                  onClick={() => { onClose(); navigate(`/profile/${u.username}`); }}
-                  className="avatar"
-                  style={{ width: '36px', height: '36px', fontSize: '14px', cursor: 'pointer', flexShrink: 0 }}
-                >
-                  {u.username?.charAt(0).toUpperCase()}
-                </div>
+               <div
+  onClick={() => { onClose(); navigate(`/profile/${u.username}`); }}
+  className="avatar"
+  style={{
+    width: '36px', height: '36px', fontSize: '14px', cursor: 'pointer', flexShrink: 0,
+    overflow: 'hidden',
+    background: u.profilePhoto ? 'transparent' : `hsl(${u.username?.charCodeAt(0) * 10}, 65%, 55%)`
+  }}
+>
+  {u.profilePhoto ? (
+    <img src={u.profilePhoto} alt={u.username} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+  ) : (
+    u.username?.charAt(0).toUpperCase()
+  )}
+</div>
                 <div
                   onClick={() => { onClose(); navigate(`/profile/${u.username}`); }}
                   style={{ flex: 1, cursor: 'pointer', fontSize: '13px', fontWeight: '500', color: 'var(--text-primary)' }}

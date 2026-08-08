@@ -307,9 +307,13 @@ export default function Layout({ children }) {
   border: '1px solid var(--border)',
   background: 'var(--bg-card)', marginTop: '8px'
 }}>
-  <div className="avatar" style={{ width: '36px', height: '36px', fontSize: '14px' }}>
-    {user?.username?.charAt(0).toUpperCase()}
-  </div>
+  <div className="avatar" style={{ width: '36px', height: '36px', fontSize: '14px', overflow: 'hidden' }}>
+  {user?.profilePhoto ? (
+    <img src={user.profilePhoto} alt={user.username} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+  ) : (
+    user?.username?.charAt(0).toUpperCase()
+  )}
+</div>
   <div style={{ flex: 1, minWidth: 0 }}>
     <div style={{
       fontSize: '13px', fontWeight: '600',

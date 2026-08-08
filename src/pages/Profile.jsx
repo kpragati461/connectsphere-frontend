@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { getMyProfile, getUserProfile, updateMyProfile, toggleFollow, toggleBlock, getBlockStatus } from '../api/UserApi';
 import { getUserPosts, getSavedPosts, deletePost } from '../api/postApi';
 import { Edit3, Check, X, Bookmark } from 'lucide-react';
@@ -10,7 +10,6 @@ import FollowListModal from '../components/FollowListModal';
 export default function Profile() {
   const { user } = useAuth();
   const { username } = useParams();
-  const navigate = useNavigate();
 
   const isOwnProfile = !username || username === user?.username;
   const profileUsername = username || user?.username;
@@ -133,8 +132,7 @@ export default function Profile() {
   return (
     <div>
       {/* Profile card */}
-      <div className="card" style={{ marginBottom: '12px', overflow: 'hidden' }}>
-
+      <div className="card" style={{ marginBottom: '12px', overflow: 'hidden', padding: '0 0 16px' }}>
         {/* Cover */}
         <div style={{
           height: '100px',
@@ -142,47 +140,60 @@ export default function Profile() {
         }} />
 
         {/* Avatar + actions */}
-        <div style={{ padding: '0 20px 20px', position: 'relative' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '16px' }}>
-            <div className="avatar" style={{
-              width: '80px', height: '80px', fontSize: '28px',
-              border: '4px solid white', marginTop: '-40px',
-              background: `hsl(${profile.username?.charCodeAt(0) * 10}, 65%, 55%)`,
-              boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
-              position: 'relative', zIndex: 1
-            }}>
-              {profile.username?.charAt(0).toUpperCase()}
-            </div>
-
-            {isOwnProfile ? (
-              <button onClick={() => setEditing(!editing)} className="btn-secondary" style={{
-                display: 'flex', alignItems: 'center', gap: '6px', fontSize: '13px', padding: '7px 14px'
-              }}>
-                <Edit3 size={14} /> Edit Profile
-              </button>
+        <div style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'flex-end',
+          marginTop: '-40px',
+          padding: '0 20px 20px'
+        }}>
+          <div className="avatar" style={{
+            width: '80px', height: '80px', fontSize: '28px',
+            border: '4px solid white',
+            background: profile.profilePhoto ? 'transparent' : `hsl(${profile.username?.charCodeAt(0) * 10}, 65%, 55%)`,
+            boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
+            position: 'relative', zIndex: 1, overflow: 'hidden'
+          }}>
+            {profile.profilePhoto ? (
+              <img
+                src={profile.profilePhoto}
+                alt={profile.username}
+                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+              />
             ) : (
-              <div style={{ display: 'flex', gap: '8px' }}>
-                <button onClick={handleFollow} style={{
-                  padding: '7px 20px', borderRadius: '8px',
-                  background: following ? 'var(--bg-card)' : '#6366f1',
-                  color: following ? 'var(--text-secondary)' : 'white',
-                  border: following ? '1px solid var(--border)' : 'none',
-                  fontWeight: '600', fontSize: '13px', cursor: 'pointer'
-                }}>
-                  {following ? 'Following' : 'Follow'}
-                </button>
-                <button onClick={handleBlock} style={{
-                  padding: '7px 14px', borderRadius: '8px', border: 'none',
-                  background: blocked ? '#fee2e2' : 'var(--bg-hover)',
-                  color: blocked ? '#dc2626' : 'var(--text-muted)',
-                  fontWeight: '500', fontSize: '13px', cursor: 'pointer'
-                }}>
-                  {blocked ? 'Unblock' : 'Block'}
-                </button>
-              </div>
+              profile.username?.charAt(0).toUpperCase()
             )}
           </div>
+          {isOwnProfile ? (
+            <button onClick={() => setEditing(!editing)} className="btn-secondary" style={{
+              display: 'flex', alignItems: 'center', gap: '6px', fontSize: '13px', padding: '7px 14px'
+            }}>
+              <Edit3 size={14} /> Edit Profile
+            </button>
+          ) : (
+            <div style={{ display: 'flex', gap: '8px' }}>
+              <button onClick={handleFollow} style={{
+                padding: '7px 20px', borderRadius: '8px',
+                background: following ? 'var(--bg-card)' : '#6366f1',
+                color: following ? 'var(--text-secondary)' : 'white',
+                border: following ? '1px solid var(--border)' : 'none',
+                fontWeight: '600', fontSize: '13px', cursor: 'pointer'
+              }}>
+                {following ? 'Following' : 'Follow'}
+              </button>
+              <button onClick={handleBlock} style={{
+                padding: '7px 14px', borderRadius: '8px', border: 'none',
+                background: blocked ? '#fee2e2' : 'var(--bg-hover)',
+                color: blocked ? '#dc2626' : 'var(--text-muted)',
+                fontWeight: '500', fontSize: '13px', cursor: 'pointer'
+              }}>
+                {blocked ? 'Unblock' : 'Block'}
+              </button>
+            </div>
+          )}
+        </div>
 
+        <div style={{ padding: '0 20px' }}>
           {/* Name + info */}
           <div style={{ marginBottom: '12px' }}>
             <div style={{ fontWeight: '700', fontSize: '20px', marginBottom: '2px', color: 'var(--text-primary)' }}>

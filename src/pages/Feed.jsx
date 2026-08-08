@@ -1,7 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { getFeed, createPost, deletePost } from '../api/postApi';
-import { Image } from 'lucide-react';
+import { uploadPostMedia } from '../api/MediaApi';
+import { Image, X } from 'lucide-react';
 import PostCard from '../components/PostCard';
 
 export default function Feed() {
@@ -10,6 +11,10 @@ export default function Feed() {
   const [content, setContent] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(true);
+  const [mediaFile, setMediaFile] = useState(null);
+  const [mediaPreview, setMediaPreview] = useState(null);
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef(null);
 
   const loadFeed = async () => {
     try {
@@ -24,15 +29,55 @@ export default function Feed() {
 
   useEffect(() => { loadFeed(); }, []);
 
+  const handleFileSelect = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const isImage = file.type.startsWith('image');
+    const isVideo = file.type.startsWith('video');
+    if (!isImage && !isVideo) {
+      setError('Only image or video files are allowed');
+      return;
+    }
+    if (file.size > 25 * 1024 * 1024) {
+      setError('File too large (max 25MB)');
+      return;
+    }
+
+    setError('');
+    setMediaFile(file);
+    setMediaPreview({ url: URL.createObjectURL(file), type: isVideo ? 'video' : 'image' });
+  };
+
+  const clearMedia = () => {
+    if (mediaPreview) URL.revokeObjectURL(mediaPreview.url);
+    setMediaFile(null);
+    setMediaPreview(null);
+    if (fileInputRef.current) fileInputRef.current.value = '';
+  };
+
   const handlePost = async (e) => {
     e.preventDefault();
-    if (!content.trim()) return;
+    if (!content.trim() && !mediaFile) return;
+
+    setError('');
     try {
-      await createPost({ content });
+      let mediaUrl = null;
+
+      if (mediaFile) {
+        setUploading(true);
+        const res = await uploadPostMedia(mediaFile);
+        mediaUrl = res.data.url;
+      }
+
+      await createPost({ content, mediaUrl });
       setContent('');
+      clearMedia();
       loadFeed();
-    } catch {
-      setError('Failed to create post');
+    } catch (err) {
+      setError(err.response?.data?.error || 'Failed to create post');
+    } finally {
+      setUploading(false);
     }
   };
 
@@ -50,9 +95,13 @@ export default function Feed() {
       {/* Create post card */}
       <div className="card" style={{ padding: '16px', marginBottom: '12px' }}>
         <div style={{ display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
-          <div className="avatar" style={{ width: '42px', height: '42px', fontSize: '16px', flexShrink: 0 }}>
-            {user?.username?.charAt(0).toUpperCase()}
-          </div>
+          <div className="avatar" style={{ width: '42px', height: '42px', fontSize: '16px', flexShrink: 0, overflow: 'hidden' }}>
+  {user?.profilePhoto ? (
+    <img src={user.profilePhoto} alt={user.username} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+  ) : (
+    user?.username?.charAt(0).toUpperCase()
+  )}
+</div>
           <form onSubmit={handlePost} style={{ flex: 1 }}>
             <textarea
               value={content}
@@ -70,16 +119,59 @@ export default function Feed() {
               onFocus={e => e.target.style.borderColor = '#6366f1'}
               onBlur={e => e.target.style.borderColor = '#e5e7eb'}
             />
+
+            {mediaPreview && (
+              <div style={{ position: 'relative', marginTop: '10px', display: 'inline-block' }}>
+                {mediaPreview.type === 'video' ? (
+                  <video
+                    src={mediaPreview.url}
+                    controls
+                    style={{ maxHeight: '220px', borderRadius: '10px', display: 'block' }}
+                  />
+                ) : (
+                  <img
+                    src={mediaPreview.url}
+                    alt="preview"
+                    style={{ maxHeight: '220px', borderRadius: '10px', display: 'block' }}
+                  />
+                )}
+                <button
+                  type="button"
+                  onClick={clearMedia}
+                  style={{
+                    position: 'absolute', top: '6px', right: '6px',
+                    background: 'rgba(0,0,0,0.6)', border: 'none', borderRadius: '50%',
+                    width: '24px', height: '24px', display: 'flex', alignItems: 'center',
+                    justifyContent: 'center', cursor: 'pointer', color: 'white'
+                  }}
+                >
+                  <X size={14} />
+                </button>
+              </div>
+            )}
+
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '10px' }}>
-              <button type="button" style={{
+              <label style={{
                 display: 'flex', alignItems: 'center', gap: '6px',
                 background: 'none', border: 'none', color: '#9ca3af',
                 cursor: 'pointer', fontSize: '13px', padding: '4px 8px', borderRadius: '6px'
               }}>
-                <Image size={16} /> Photo
-              </button>
-              <button type="submit" className="btn-primary" style={{ padding: '7px 20px' }}>
-                Post
+                <Image size={16} /> Photo/Video
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*,video/*"
+                  onChange={handleFileSelect}
+                  style={{ display: 'none' }}
+                />
+              </label>
+              <button
+                type="submit"
+                className="btn-primary"
+                disabled={uploading || (!content.trim() && !mediaFile)}
+                style={{ padding: '7px 20px', opacity: uploading ? 0.6 : 1 }}
+              >
+                {uploading ? 'Posting…' : 'Post'}
               </button>
             </div>
           </form>

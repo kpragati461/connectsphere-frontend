@@ -4,6 +4,11 @@ import { toggleLike, toggleBookmark, getComments, addComment, deleteComment } fr
 import { Heart, MessageCircle, Trash2, Send, Bookmark, Share2 } from 'lucide-react';
 import ShareModal from './ShareModal';
 
+const isVideoUrl = (url) => {
+  if (!url) return false;
+  return /\.(mp4|webm|mov|ogg)(\?|$)/i.test(url) || url.includes('/video/upload/');
+};
+
 export default function PostCard({ post, currentUser, onDelete }) {
   const navigate = useNavigate();
   const [comments, setComments] = useState([]);
@@ -77,11 +82,15 @@ export default function PostCard({ post, currentUser, onDelete }) {
           style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer' }}
         >
           <div className="avatar" style={{
-            width: '42px', height: '42px', fontSize: '16px',
-            background: `hsl(${post.username?.charCodeAt(0) * 10}, 65%, 55%)`
-          }}>
-            {post.username?.charAt(0).toUpperCase()}
-          </div>
+  width: '42px', height: '42px', fontSize: '16px', overflow: 'hidden',
+  background: post.profilePhoto ? 'transparent' : `hsl(${post.username?.charCodeAt(0) * 10}, 65%, 55%)`
+}}>
+  {post.profilePhoto ? (
+    <img src={post.profilePhoto} alt={post.username} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+  ) : (
+    post.username?.charAt(0).toUpperCase()
+  )}
+</div>
           <div>
             <div style={{ fontWeight: '600', fontSize: '14px', color: 'var(--text-primary)' }}>
               @{post.username}
@@ -104,9 +113,30 @@ export default function PostCard({ post, currentUser, onDelete }) {
       </div>
 
       {/* Post content */}
-      <div style={{ padding: '0 16px 14px', fontSize: '15px', color: 'var(--text-primary)', lineHeight: '1.6' }}>
-        {post.content}
-      </div>
+      {post.content && (
+        <div style={{ padding: '0 16px 14px', fontSize: '15px', color: 'var(--text-primary)', lineHeight: '1.6' }}>
+          {post.content}
+        </div>
+      )}
+
+      {/* Post media */}
+      {post.mediaUrl && (
+        <div style={{ padding: post.content ? '0 0 14px' : '0' }}>
+          {isVideoUrl(post.mediaUrl) ? (
+            <video
+              src={post.mediaUrl}
+              controls
+              style={{ width: '100%', maxHeight: '480px', objectFit: 'contain', display: 'block', background: '#000' }}
+            />
+          ) : (
+            <img
+              src={post.mediaUrl}
+              alt="post media"
+              style={{ width: '100%', maxHeight: '480px', objectFit: 'contain', display: 'block', background: 'var(--bg-secondary)' }}
+            />
+          )}
+        </div>
+      )}
 
       {/* Divider */}
       <div style={{ borderTop: '1px solid var(--border-light)', margin: '0 16px' }} />
@@ -175,11 +205,11 @@ export default function PostCard({ post, currentUser, onDelete }) {
           {comments.map((c) => (
             <div key={c.id} style={{ display: 'flex', gap: '8px', marginBottom: '10px' }}>
               <div className="avatar" style={{
-                width: '28px', height: '28px', fontSize: '11px', flexShrink: 0,
-                background: `hsl(${c.username?.charCodeAt(0) * 10}, 65%, 55%)`
-              }}>
-                {c.username?.charAt(0).toUpperCase()}
-              </div>
+  width: '28px', height: '28px', fontSize: '11px', flexShrink: 0,
+  background: `hsl(${c.username?.charCodeAt(0) * 10}, 65%, 55%)`
+}}>
+  {c.username?.charAt(0).toUpperCase()}
+</div>
               <div style={{
                 background: 'var(--bg-card)', borderRadius: '10px', padding: '8px 12px',
                 flex: 1, border: '1px solid var(--border-light)'
